@@ -3,113 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kitsune Hub - Save Scripts</title>
+  <title>Kitsune Hub - Editor de Scripts</title>
   <style>
     body {
       background: #0d0d0d;
       color: #00ff99;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: monospace, monospace;
       margin: 0;
-      padding: 20px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    input, textarea, button {
-      width: 100%;
-      margin-bottom: 10px;
-      background: #111;
-      color: #0f0;
-      border: 1px solid #0f0;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 14px;
       padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #container {
+      display: flex;
+      gap: 10px;
+      flex-grow: 1;
+      min-height: 400px;
+    }
+    #pasteList {
+      width: 200px;
+      background: #111;
+      border: 2px solid #00ff99;
+      border-radius: 6px;
+      padding: 5px;
+      overflow-y: auto;
+    }
+    #pasteList li {
+      padding: 6px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #pasteList li.selected {
+      background: #005544;
+    }
+    #pasteList li:hover:not(.selected) {
+      background: #003322;
+    }
+    #pasteList button.deleteBtn {
+      background: transparent;
+      border: none;
+      color: #ff5555;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+    #editor {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    textarea#pasteContentInput {
+      flex-grow: 1;
+      background: #000;
+      color: #0f0;
+      border: 2px solid #00ff99;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace, monospace;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 300px;
+    }
+    #buttons {
+      margin-top: 8px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     button {
-      cursor: pointer;
-      border: 2px solid #00ff99;
       background: #003322;
       color: #00ff99;
-      font-weight: bold;
-      transition: 0.3s;
+      border: 2px solid #00ff99;
+      padding: 8px 14px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-grow: 1;
+      transition: background 0.3s;
     }
     button:hover {
       background: #005544;
     }
-    label {
-      font-weight: bold;
-      margin-bottom: 4px;
-      display: block;
-    }
-    #linkOutput {
+    #shareLink {
+      margin-top: 10px;
       background: #000;
-      padding: 10px;
+      color: #0f0;
+      border: 2px solid #00ff99;
       border-radius: 6px;
-      font-family: monospace;
-      word-break: break-word;
+      padding: 8px;
+      font-family: monospace, monospace;
+      font-size: 14px;
+      width: 100%;
+      user-select: all;
+    }
+    @media (max-width: 600px) {
+      #container {
+        flex-direction: column;
+      }
+      #pasteList {
+        width: 100%;
+        max-height: 150px;
+        overflow-y: auto;
+        margin-bottom: 10px;
+      }
+      #editor textarea {
+        min-height: 200px;
+      }
+      button {
+        flex-grow: unset;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Kitsune Hub - Salvar Script Roblox 🦊</h1>
+  <h1>🦊 Kitsune Hub - Editor de Scripts Roblox</h1>
+  <div id="container">
+    <ul id="pasteList" aria-label="Lista de scripts salvos"></ul>
 
-  <label for="folderInput">Nome da pasta (folder):</label>
-  <input type="text" id="folderInput" placeholder="Ex: aimbot" />
-
-  <label for="idInput">ID do script:</label>
-  <input type="text" id="idInput" placeholder="Ex: v1" />
-
-  <label for="scriptInput">Conteúdo do script:</label>
-  <textarea id="scriptInput" rows="8" placeholder="Cole seu script Roblox aqui..."></textarea>
-
-  <button id="saveBtn">Salvar Script</button>
-
-  <h2>Link para usar no Roblox</h2>
-  <div id="linkOutput">Nenhum script salvo ainda.</div>
+    <div id="editor">
+      <textarea id="pasteContentInput" placeholder="Cole seu script Roblox aqui..."></textarea>
+      <div id="buttons">
+        <button id="saveBtn">Salvar Script</button>
+        <button id="deleteBtn">Excluir Script</button>
+        <button id="newPasteBtn">Novo Script</button>
+      </div>
+      <input id="shareLink" readonly placeholder="Link para usar no Roblox aparecerá aqui..." />
+    </div>
+  </div>
 
   <script>
-    const saveBtn = document.getElementById('saveBtn');
-    const folderInput = document.getElementById('folderInput');
-    const idInput = document.getElementById('idInput');
-    const scriptInput = document.getElementById('scriptInput');
-    const linkOutput = document.getElementById('linkOutput');
-
-    // Altere para a URL do seu backend Node.js
-    const backendUrl = 'https://SEUSERVIDOR.com'; 
-
-    saveBtn.addEventListener('click', () => {
-      const folder = folderInput.value.trim();
-      const id = idInput.value.trim();
-      const content = scriptInput.value.trim();
-
-      if (!folder || !id || !content) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-
-      fetch(backendUrl + '/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folder, id, content }),
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('Erro ao salvar script');
-          return res.text();
-        })
-        .then(text => {
-          alert(text);
-          const loadstringLink = `${backendUrl}/raw/${encodeURIComponent(folder)}/${encodeURIComponent(id)}`;
-          linkOutput.innerHTML = `
-            <p>🔗 <a href="${loadstringLink}" target="_blank">${loadstringLink}</a></p>
-            <p><strong>Uso no Roblox:</strong></p>
-            <code>loadstring(game:HttpGet("${loadstringLink}"))()</code>
-          `;
-        })
-        .catch(err => {
-          alert('Erro: ' + err.message);
-        });
-    });
+    // [Cole aqui o JS que te mandei no chat anterior]
+    // Por favor copie o JS completo que te enviei para o funcionamento total.
   </script>
 </body>
 </html>
