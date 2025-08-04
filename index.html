@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Kitsune Pastefy 🦊</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0b0f0c;
+      font-family: 'Segoe UI', sans-serif;
+      color: #a0fca0;
+    }
+
+    header {
+      background: #0f0;
+      color: #000;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #101510;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #0f0a;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 15px;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 16px;
+      border: 2px solid #0f0;
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    button {
+      background: #0f0;
+      border: none;
+      color: #000;
+      padding: 10px 20px;
+      margin: 10px 5px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00cc00;
+    }
+
+    #pastesList {
+      margin-top: 20px;
+    }
+
+    .pasteItem {
+      background: #080;
+      color: #000;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pasteItem span {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .pasteItem button {
+      background: #000;
+      color: #0f0;
+      padding: 5px 10px;
+    }
+
+    #loadstringPanel {
+      display: none;
+      background: #000;
+      color: #0f0;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+      box-shadow: 0 0 20px #0f0a;
+    }
+
+    #loadstringPanel textarea {
+      height: 150px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>🦊 Kitsune Pastefy</header>
+
+  <div class="container">
+
+    <textarea id="editor" placeholder="Cole seu código ou texto aqui..."></textarea>
+    <br>
+    <input type="text" id="pasteTitle" placeholder="Nome da pasta" style="width: 40%; padding: 8px; border-radius: 5px; border: 2px solid #0f0; background: #000; color: #0f0;">
+    <button onclick="savePaste()">Salvar</button>
+    <button onclick="clearEditor()">Limpar</button>
+    <button onclick="openLoadstringPanel()">Kitsune Loadstring 🦊</button>
+
+    <div id="pastesList"></div>
+
+    <div id="loadstringPanel">
+      <h2>Kitsune Loadstring 🦊</h2>
+      <textarea id="inputCode" placeholder="Cole aqui seu script..."></textarea>
+      <button onclick="generateLoadstring()">Gerar Loadstring</button>
+      <textarea id="outputCode" readonly placeholder="Seu Loadstring aparecerá aqui..."></textarea>
+      <button onclick="copyLoadstring()">Copiar</button>
+    </div>
+
+  </div>
+
+  <script>
+    const editor = document.getElementById("editor");
+    const pasteTitle = document.getElementById("pasteTitle");
+    const pastesList = document.getElementById("pastesList");
+
+    function generateID() {
+      return Math.random().toString(36).substr(2, 8);
+    }
+
+    function savePaste() {
+      const content = editor.value.trim();
+      const title = pasteTitle.value.trim() || "Sem Título";
+      if (!content) return alert("Digite algo para salvar!");
+      const pastes = JSON.parse(localStorage.getItem("pastes") || "[]");
+      const id = generateID();
+      pastes.push({ id, title, content });
+      localStorage.setItem("pastes", JSON.stringify(pastes));
+      editor.value = "";
+      pasteTitle.value = "";
+      renderPasteList();
+    }
+
+    function renderPasteList() {
+      const pastes = JSON.parse(localStorage.getItem("pastes") || "[]");
+      pastesList.innerHTML = "<h3>Pastas salvas:</h3>";
+      pastes.reverse().forEach(p => {
+        const div = document.createElement("div");
+        div.className = "pasteItem";
+        div.innerHTML = `
+          <span onclick="loadPaste('${p.id}')">${p.title}</span>
+          <div>
+            <button onclick="viewRaw('${p.id}')">Raw</button>
+            <button onclick="deletePaste('${p.id}')">X</button>
+          </div>`;
+        pastesList.appendChild(div);
+      });
+    }
+
+    function loadPaste(id) {
+      const pastes = JSON.parse(localStorage.getItem("pastes") || "[]");
+      const paste = pastes.find(p => p.id === id);
+      if (paste) {
+        editor.value = paste.content;
+        pasteTitle.value = paste.title;
+      }
+    }
+
+    function deletePaste(id) {
+      let pastes = JSON.parse(localStorage.getItem("pastes") || "[]");
+      pastes = pastes.filter(p => p.id !== id);
+      localStorage.setItem("pastes", JSON.stringify(pastes));
+      renderPasteList();
+    }
+
+    function clearEditor() {
+      editor.value = "";
+      pasteTitle.value = "";
+    }
+
+    function viewRaw(id) {
+      window.location.search = "?raw=" + id;
+    }
+
+    function checkRawView() {
+      const params = new URLSearchParams(window.location.search);
+      const rawId = params.get("raw");
+      if (rawId) {
+        const pastes = JSON.parse(localStorage.getItem("pastes") || "[]");
+        const paste = pastes.find(p => p.id === rawId);
+        if (paste) {
+          document.body.innerHTML = "";
+          const pre = document.createElement("pre");
+          pre.textContent = paste.content;
+          pre.style.whiteSpace = "pre-wrap";
+          pre.style.margin = "30px";
+          pre.style.color = "#0f0";
+          pre.style.fontFamily = "monospace";
+          pre.style.fontSize = "16px";
+          document.body.appendChild(pre);
+        } else {
+          document.body.innerHTML = "<h2 style='color:#f00; text-align:center;'>Paste não encontrado.</h2>";
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function openLoadstringPanel() {
+      document.getElementById("loadstringPanel").style.display = "block";
+    }
+
+    function generateLoadstring() {
+      const input = document.getElementById("inputCode").value.trim();
+      if (!input) return alert("Cole algum código!");
+      const encoded = btoa(input);
+      const output = `loadstring(game:HttpGet("https://pastefy.app/raw/${encoded}", true))()`;
+      document.getElementById("outputCode").value = output;
+    }
+
+    function copyLoadstring() {
+      const out = document.getElementById("outputCode");
+      out.select();
+      document.execCommand("copy");
+      alert("Loadstring copiado!");
+    }
+
+    if (!checkRawView()) renderPasteList();
+  </script>
+</body>
+</html>
