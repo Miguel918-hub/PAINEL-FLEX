@@ -1,152 +1,415 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kitsune Hub - Editor de Scripts</title>
-  <style>
-    body {
-      background: #0d0d0d;
-      color: #00ff99;
-      font-family: monospace, monospace;
-      margin: 0;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kitsune Hub - Multi idioma</title>
+<style>
+  body,html {
+    margin:0; padding:0; height:100%;
+    font-family: monospace, monospace;
+    background: #0d0d0d;
+    color: #00ff99;
+    display: flex;
+    flex-direction: column;
+  }
+  #languageSelect, #mainApp {
+    flex-grow: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+  }
+  #languageSelect.active, #mainApp.active {
+    display: flex;
+  }
+  #languageSelect input {
+    background: #111;
+    border: 2px solid #00ff99;
+    border-radius: 6px;
+    padding: 10px;
+    color: #0f0;
+    font-size: 1.2em;
+    width: 250px;
+    max-width: 90vw;
+    margin-bottom: 10px;
+    outline: none;
+  }
+  #languageSelect button {
+    background: #003322;
+    border: 2px solid #00ff99;
+    color: #00ff99;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #languageSelect button:hover {
+    background: #005544;
+  }
+  h1 {
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 900px;
+    height: 100%;
+  }
+  #pasteList {
+    width: 200px;
+    background: #111;
+    border: 2px solid #00ff99;
+    border-radius: 6px;
+    padding: 5px;
+    overflow-y: auto;
+  }
+  #pasteList li {
+    padding: 6px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #pasteList li.selected {
+    background: #005544;
+  }
+  #pasteList li:hover:not(.selected) {
+    background: #003322;
+  }
+  #pasteList button.deleteBtn {
+    background: transparent;
+    border: none;
+    color: #ff5555;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  #editor {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  textarea#pasteContentInput {
+    flex-grow: 1;
+    background: #000;
+    color: #0f0;
+    border: 2px solid #00ff99;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: monospace, monospace;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    min-height: 300px;
+  }
+  #buttons {
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: #003322;
+    color: #00ff99;
+    border: 2px solid #00ff99;
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-grow: 1;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #005544;
+  }
+  #shareLink {
+    margin-top: 10px;
+    background: #000;
+    color: #0f0;
+    border: 2px solid #00ff99;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: monospace, monospace;
+    font-size: 14px;
+    width: 100%;
+    user-select: all;
+  }
+  @media (max-width: 600px) {
     #container {
-      display: flex;
-      gap: 10px;
-      flex-grow: 1;
-      min-height: 400px;
+      flex-direction: column;
+      height: auto;
     }
     #pasteList {
-      width: 200px;
-      background: #111;
-      border: 2px solid #00ff99;
-      border-radius: 6px;
-      padding: 5px;
+      width: 100%;
+      max-height: 150px;
       overflow-y: auto;
+      margin-bottom: 10px;
     }
-    #pasteList li {
-      padding: 6px;
-      margin-bottom: 4px;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #pasteList li.selected {
-      background: #005544;
-    }
-    #pasteList li:hover:not(.selected) {
-      background: #003322;
-    }
-    #pasteList button.deleteBtn {
-      background: transparent;
-      border: none;
-      color: #ff5555;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-    }
-    #editor {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    textarea#pasteContentInput {
-      flex-grow: 1;
-      background: #000;
-      color: #0f0;
-      border: 2px solid #00ff99;
-      border-radius: 6px;
-      padding: 10px;
-      font-family: monospace, monospace;
-      font-size: 14px;
-      resize: none;
-      outline: none;
-      min-height: 300px;
-    }
-    #buttons {
-      margin-top: 8px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    #editor textarea {
+      min-height: 200px;
     }
     button {
-      background: #003322;
-      color: #00ff99;
-      border: 2px solid #00ff99;
-      padding: 8px 14px;
-      font-size: 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      flex-grow: 1;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #005544;
-    }
-    #shareLink {
-      margin-top: 10px;
-      background: #000;
-      color: #0f0;
-      border: 2px solid #00ff99;
-      border-radius: 6px;
-      padding: 8px;
-      font-family: monospace, monospace;
-      font-size: 14px;
+      flex-grow: unset;
       width: 100%;
-      user-select: all;
     }
-    @media (max-width: 600px) {
-      #container {
-        flex-direction: column;
-      }
-      #pasteList {
-        width: 100%;
-        max-height: 150px;
-        overflow-y: auto;
-        margin-bottom: 10px;
-      }
-      #editor textarea {
-        min-height: 200px;
-      }
-      button {
-        flex-grow: unset;
-        width: 100%;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <h1>🦊 Kitsune Hub - Editor de Scripts Roblox</h1>
-  <div id="container">
-    <ul id="pasteList" aria-label="Lista de scripts salvos"></ul>
 
-    <div id="editor">
-      <textarea id="pasteContentInput" placeholder="Cole seu script Roblox aqui..."></textarea>
-      <div id="buttons">
-        <button id="saveBtn">Salvar Script</button>
-        <button id="deleteBtn">Excluir Script</button>
-        <button id="newPasteBtn">Novo Script</button>
+  <div id="languageSelect" class="active">
+    <h1>Choose your language / Escolha seu idioma</h1>
+    <input id="languageInput" type="text" placeholder="Type your language (e.g. English, Português)" />
+    <button id="confirmLangBtn">Confirm / Confirmar</button>
+  </div>
+
+  <div id="mainApp">
+    <h1 id="title">🦊 Kitsune Hub - Roblox Script Editor</h1>
+    <div id="container">
+      <ul id="pasteList" aria-label="Saved scripts list"></ul>
+
+      <div id="editor">
+        <textarea id="pasteContentInput" placeholder="Paste your Roblox script here..."></textarea>
+        <div id="buttons">
+          <button id="saveBtn">Save Script</button>
+          <button id="deleteBtn">Delete Script</button>
+          <button id="newPasteBtn">New Script</button>
+        </div>
+        <input id="shareLink" readonly placeholder="The link to use in Roblox will appear here..." />
       </div>
-      <input id="shareLink" readonly placeholder="Link para usar no Roblox aparecerá aqui..." />
     </div>
   </div>
 
-  <script>
-    // [Cole aqui o JS que te mandei no chat anterior]
-    // Por favor copie o JS completo que te enviei para o funcionamento total.
-  </script>
-</body>
-</html>
+<script>
+  (() => {
+    // Traduções simples
+    const translations = {
+      english: {
+        title: "🦊 Kitsune Hub - Roblox Script Editor",
+        pastePlaceholder: "Paste your Roblox script here...",
+        saveBtn: "Save Script",
+        deleteBtn: "Delete Script",
+        newPasteBtn: "New Script",
+        shareLinkPlaceholder: "The link to use in Roblox will appear here...",
+        noScripts: "No scripts saved.",
+        confirmLangBtn: "Confirm / Confirmar",
+        langInputPlaceholder: "Type your language (e.g. English, Português)",
+        chooseLangTitle: "Choose your language / Escolha seu idioma"
+      },
+      português: {
+        title: "🦊 Kitsune Hub - Editor de Scripts Roblox",
+        pastePlaceholder: "Cole seu script Roblox aqui...",
+        saveBtn: "Salvar Script",
+        deleteBtn: "Excluir Script",
+        newPasteBtn: "Novo Script",
+        shareLinkPlaceholder: "O link para usar no Roblox aparecerá aqui...",
+        noScripts: "Nenhum script salvo.",
+        confirmLangBtn: "Confirmar",
+        langInputPlaceholder: "Digite seu idioma (ex: English, Português)",
+        chooseLangTitle: "Escolha seu idioma / Choose your language"
+      }
+    };
+
+    // Detecta idioma digitado e aplica traduções
+    function applyLanguage(lang) {
+      lang = lang.toLowerCase().trim();
+      let tr = translations[lang];
+      if (!tr) tr = translations['english']; // fallback
+
+      document.getElementById('title').textContent = tr.title;
+      document.getElementById('pasteContentInput').placeholder = tr.pastePlaceholder;
+      document.getElementById('saveBtn').textContent = tr.saveBtn;
+      document.getElementById('deleteBtn').textContent = tr.deleteBtn;
+      document.getElementById('newPasteBtn').textContent = tr.newPasteBtn;
+      document.getElementById('shareLink').placeholder = tr.shareLinkPlaceholder;
+      document.getElementById('languageInput').placeholder = tr.langInputPlaceholder;
+      document.querySelector('#languageSelect h1').textContent = tr.chooseLangTitle;
+      document.getElementById('confirmLangBtn').textContent = tr.confirmLangBtn;
+
+      // Atualiza mensagem de lista vazia
+      updateNoScriptsText(tr.noScripts);
+    }
+
+    // Atualiza texto "nenhum script salvo"
+    function updateNoScriptsText(text) {
+      const pasteListEl = document.getElementById('pasteList');
+      if (pasteListEl.children.length === 0) {
+        pasteListEl.innerHTML = `<li style="color:#555;cursor:default;">${text}</li>`;
+      }
+    }
+
+    // --- O resto do seu JS Kitsune Hub abaixo (adaptado para chamar updateNoScriptsText) ---
+
+    const pasteListEl = document.getElementById('pasteList');
+    const pasteContentInput = document.getElementById('pasteContentInput');
+    const saveBtn = document.getElementById('saveBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const newPasteBtn = document.getElementById('newPasteBtn');
+    const shareLinkInput = document.getElementById('shareLink');
+
+    let pastes = [];
+    let selectedPasteId = null;
+    let currentLang = 'english';
+
+    function loadPastes() {
+      const saved = localStorage.getItem('kitsune_pastes');
+      if (saved) {
+        try {
+          pastes = JSON.parse(saved);
+        } catch {
+          pastes = [];
+        }
+      } else {
+        pastes = [];
+      }
+    }
+
+    function savePastes() {
+      localStorage.setItem('kitsune_pastes', JSON.stringify(pastes));
+    }
+
+    function renderPasteList() {
+      pasteListEl.innerHTML = '';
+      if (pastes.length === 0) {
+        pasteListEl.innerHTML = `<li style="color:#555;cursor:default;">${translations[currentLang].noScripts}</li>`;
+        return;
+      }
+      pastes.forEach(paste => {
+        const li = document.createElement('li');
+        li.classList.toggle('selected', paste.id === selectedPasteId);
+        li.textContent = paste.id;
+        li.title = paste.id;
+        li.style.cursor = 'pointer';
+
+        li.addEventListener('click', () => selectPaste(paste.id));
+
+        // Botão excluir
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '×';
+        delBtn.className = 'deleteBtn';
+        delBtn.title = 'Excluir script';
+        delBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          if (confirm(currentLang === 'português' ? 'Excluir este script?' : 'Delete this script?')) {
+            deletePaste(paste.id);
+          }
+        });
+        li.appendChild(delBtn);
+
+        pasteListEl.appendChild(li);
+      });
+    }
+
+    function selectPaste(id) {
+      const paste = pastes.find(p => p.id === id);
+      if (!paste) return;
+      selectedPasteId = id;
+      pasteContentInput.value = paste.content || '';
+      updateShareLink(id);
+      renderPasteList();
+    }
+
+    function newPaste() {
+      selectedPasteId = null;
+      pasteContentInput.value = '';
+      shareLinkInput.value = '';
+      renderPasteList();
+      pasteContentInput.focus();
+    }
+
+    function saveCurrentPaste() {
+      const content = pasteContentInput.value.trim();
+      if (!content) {
+        alert(currentLang === 'português' ? 'O conteúdo do script não pode ser vazio.' : 'Script content cannot be empty.');
+        return;
+      }
+
+      if (!selectedPasteId) {
+        selectedPasteId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      }
+
+      const existingIndex = pastes.findIndex(p => p.id === selectedPasteId);
+      if (existingIndex >= 0) {
+        pastes[existingIndex].content = content;
+      } else {
+        pastes.push({ id: selectedPasteId, content });
+      }
+      savePastes();
+      renderPasteList();
+      updateShareLink(selectedPasteId);
+      alert(currentLang === 'português' ? 'Script salvo localmente!' : 'Script saved locally!');
+    }
+
+    function deletePaste(id) {
+      pastes = pastes.filter(p => p.id !== id);
+      if (selectedPasteId === id) {
+        newPaste();
+      }
+      savePastes();
+      renderPasteList();
+      shareLinkInput.value = '';
+    }
+
+    function updateShareLink(id) {
+      if (!id) {
+        shareLinkInput.value = '';
+        return;
+      }
+      const baseUrl = location.origin + location.pathname;
+      shareLinkInput.value = `${baseUrl}?id=${encodeURIComponent(id)}`;
+    }
+
+    // Verifica se está no modo raw (mostrar só o script)
+    function checkRawView() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        const paste = pastes.find(p => p.id === id);
+        if (paste) {
+          document.body.innerHTML = '';
+          const pre = document.createElement('pre');
+          pre.style.background = '#000';
+          pre.style.color = '#0f0';
+          pre.style.padding = '20px';
+          pre.style.whiteSpace = 'pre-wrap';
+          pre.style.fontFamily = 'monospace';
+          pre.style.fontSize = '1.1em';
+          pre.style.maxWidth = '900px';
+          pre.style.margin = '20px auto';
+          pre.textContent = paste.content;
+          document.body.appendChild(pre);
+          return true;
+        } else {
+          document.body.innerHTML = '<p style="color:red; text-align:center; margin-top:20px;">Script não encontrado!</p>';
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // DOM elementos tela idioma
+    const languageSelect = document.getElementById('languageSelect');
+    const mainApp = document.getElementById('mainApp');
+    const languageInput = document.getElementById('languageInput');
+    const confirmLangBtn = document.getElementById('confirmLangBtn');
+
+    // Salva idioma e atualiza interface
+    function setLanguage(lang) {
+      lang = lang.toLowerCase().trim();
+      currentLang = translations[lang] ? lang : 'english';
+      localStorage.setItem('kitsune_lang', currentLang);
+      applyLanguage(currentLang);
+    }
+
+    // Inicializa idioma salvo ou pede idioma
+    function initLanguage() {
+      const savedLang = localStorage.getItem('kitsune_lang
