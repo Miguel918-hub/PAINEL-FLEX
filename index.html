@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🦊 Pastefy Clone Futurista</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Orbitron', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a120c;
+    color: #a3fca3;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Importar fonte Orbitron para futurista */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+  header {
+    background: linear-gradient(90deg, #042a02, #0d3f07);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #33ff33;
+    box-shadow: 0 0 12px #33ff33aa;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.8em;
+    user-select: none;
+    color: #00ff00;
+    text-shadow:
+      0 0 6px #00ff00,
+      0 0 12px #33ff33,
+      0 0 24px #22cc22;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header h1 span.emoji {
+    font-size: 1.9em;
+  }
+
+  #newPasteBtn {
+    background: #0f530f;
+    border: 2px solid #33ff33;
+    color: #a3fca3;
+    padding: 12px 22px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-shadow: 0 0 5px #33ff33;
+    box-shadow: 0 0 8px #33ff33aa;
+  }
+  #newPasteBtn:hover {
+    background: #33ff33;
+    color: #004d00;
+    border-color: #004d00;
+    box-shadow: 0 0 20px #33ff33;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    border-top: 2px solid #33ff33;
+  }
+
+  /* Sidebar */
+  #sidebar {
+    width: 300px;
+    background: #021501;
+    padding: 18px 22px;
+    overflow-y: auto;
+    border-right: 2px solid #33ff33;
+    box-shadow:
+      inset 0 0 12px #33ff3355;
+  }
+  #sidebar h2 {
+    font-weight: 700;
+    font-size: 1.3em;
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: #00ff00;
+    text-shadow:
+      0 0 6px #00ff00,
+      0 0 12px #33ff33;
+    user-select: none;
+  }
+  #pasteList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #pasteList li {
+    background: #022a02;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 4px #0a3f0a55;
+  }
+  #pasteList li:hover {
+    background: #1aff1a;
+    color: #002200;
+    box-shadow:
+      0 0 12px #00ff00,
+      0 0 20px #33ff33;
+  }
+  #pasteList li.selected {
+    background: #33ff33;
+    color: #002200;
+    box-shadow:
+      0 0 16px #33ff33,
+      0 0 28px #22cc22;
+    font-weight: 700;
+  }
+  .paste-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .deleteBtn {
+    background: transparent;
+    border: none;
+    color: #bb2222;
+    font-weight: 900;
+    cursor: pointer;
+    margin-left: 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-shadow: 0 0 4px #bb2222aa;
+  }
+  .deleteBtn:hover {
+    background-color: #bb222255;
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff4444;
+  }
+
+  /* Editor Area */
+  #editorArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 28px;
+    background: #001400;
+    box-shadow: inset 0 0 25px #22cc2277;
+    border-radius: 0 10px 10px 0;
+  }
+  #pasteTitleInput {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6em;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border: 2px solid #33ff33;
+    outline: none;
+    background: #002800;
+    color: #a3fca3;
+    font-weight: 700;
+    text-shadow:
+      0 0 5px #33ff33;
+    transition: border-color 0.3s ease;
+  }
+  #pasteTitleInput:focus {
+    border-color: #00ff00;
+    box-shadow: 0 0 15px #00ff00aa;
+  }
+  #pasteContentInput {
+    flex: 1;
+    font-family: monospace;
+    font-size: 1.1em;
+    padding: 18px 22px;
+    border-radius: 14px;
+    border: 2px solid #33ff33;
+    resize: none;
+    background: #003300;
+    color: #b0ffb0;
+    line-height: 1.5;
+    outline: none;
+    box-shadow:
+      inset 0 0 15px #22cc22aa;
+    transition: border-color 0.3s ease;
+  }
+  #pasteContentInput:focus {
+    border-color: #00ff00;
+    box-shadow:
+      inset 0 0 20px #00ff00cc;
+  }
+
+  /* Bottom buttons */
+  #buttonsArea {
+    margin-top: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  button.actionBtn {
+    background: #116611;
+    border: 2px solid #33ff33;
+    color: #a3fca3;
+    padding: 14px 24px;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+    text-shadow: 0 0 6px #33ff33;
+    box-shadow: 0 0 10px #22cc22bb;
+  }
+  button.actionBtn:hover {
+    background: #33ff33;
+    color: #004400;
+    border-color: #004400;
+    box-shadow:
+      0 0 30px #33ff33,
+      0 0 50px #22cc22;
+  }
+  #deleteBtn {
+    background: #bb2222 !important;
+    border-color: #ff4444 !important;
+    color: #ffdddd !important;
+    text-shadow: 0 0 8px #ff4444;
+    box-shadow: 0 0 15px #ff4444bb;
+  }
+  #deleteBtn:hover {
+    background: #ff4444 !important;
+    border-color: #bb2222 !important;
+    color: #fff0f0 !important;
+    box-shadow:
+      0 0 40px #ff4444,
+      0 0 60px #bb2222;
+  }
+
+  #shareLink {
+    flex: 1;
+    font-family: monospace;
+    font-size: 1em;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 2px solid #33ff33;
+    background: #002800;
+    color: #66ff66;
+    user-select: all;
+    text-shadow: 0 0 10px #33ff33bb;
+    box-shadow:
+      inset 0 0 10px #22cc22bb;
+  }
+
+  /* Scrollbar estilos */
+  #sidebar::-webkit-scrollbar {
+    width: 8px;
+  }
+  #sidebar::-webkit-scrollbar-track {
+    background: #021501;
+  }
+  #sidebar::-webkit-scrollbar-thumb {
+    background-color: #33ff33aa;
+    border-radius: 10px;
+  }
+
+  /* Responsivo simples */
+  @media (max-width: 720px) {
+    main {
+      flex-direction: column;
+    }
+    #sidebar {
+      width: 100%;
+      height: 180px;
+      border-right: none;
+      border-bottom: 2px solid #33ff33;
+      box-shadow: none;
+    }
+    #pasteList li {
+      font-size: 0.9em;
+    }
+    #editorArea {
+      border-radius: 0 0 10px 10px;
+      padding: 15px 18px;
+    }
+    #pasteContentInput {
+      font-size: 1em;
+    }
+    #pasteTitleInput {
+      font-size: 1.3em;
+    }
+    #buttonsArea {
+      flex-direction: column;
+      gap: 8px;
+    }
+    button.actionBtn {
+      width: 100%;
+      padding: 12px 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="emoji">🦊</span> Pastefy Clone</h1>
+  <button id="newPasteBtn" title="Novo Paste">+ Novo Paste</button>
+</header>
+
+<main>
+  <aside id="sidebar">
+    <h2>Seus Pastes</h2>
+    <ul id="pasteList"></ul>
+  </aside>
+
+  <section id="editorArea">
+    <input type="text" id="pasteTitleInput" placeholder="Título do Paste (opcional)" autocomplete="off" />
+    <textarea id="pasteContentInput" placeholder="Digite seu texto aqui..." spellcheck="false"></textarea>
+    <div id="buttonsArea">
+      <button class="actionBtn" id="saveBtn">Salvar</button>
+      <button class="actionBtn" id="deleteBtn">Excluir</button>
+      <input type="text" readonly id="shareLink" title="Link para compartilhar" />
+    </div>
+  </section>
+</main>
+
+<script>
+  // Funções básicas de gerenciamento de pastes no localStorage
+  const pasteListEl = document.getElementById('pasteList');
+  const pasteTitleInput = document.getElementById('pasteTitleInput');
+  const pasteContentInput = document.getElementById('pasteContentInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const newPasteBtn = document.getElementById('newPasteBtn');
+  const shareLinkInput = document.getElementById('shareLink');
+
+  let pastes = [];
+  let selectedPasteId = null;
+
+  // Carregar pastes do localStorage
+  function loadPastes() {
+    const saved = localStorage.getItem('pastefy_pastes');
+    if (saved) {
+      try {
+        pastes = JSON.parse(saved);
+      } catch {
+        pastes = [];
+      }
+    } else {
+      pastes = [];
+    }
+  }
+
+  // Salvar pastes no localStorage
+  function savePastes() {
+    localStorage.setItem('pastefy_pastes', JSON.stringify(pastes));
+  }
+
+  // Atualizar lista lateral
+  function renderPasteList() {
+    pasteListEl.innerHTML = '';
+    if(pastes.length === 0) {
+      pasteListEl.innerHTML = '<li style="color:#555;cursor:default;">Nenhum paste salvo.</li>';
+      return;
+    }
+    pastes.forEach(paste => {
+      const li = document.createElement('li');
+      li.classList.toggle('selected', paste.id === selectedPasteId);
+      li.title = paste.title || '(Sem título)';
+      
+      // Título curto
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'paste-title';
+      titleSpan.textContent = paste.title || '(Sem título)';
+      
+      li.appendChild(titleSpan);
+
+      // Botão delete
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '×';
+      delBtn.className = 'deleteBtn';
+      delBtn.title = 'Excluir paste';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if(confirm('Excluir esse paste?')) {
+          deletePaste(paste.id);
+        }
+      });
+      li.appendChild(delBtn);
+
+      li.addEventListener('click', () => {
+        selectPaste(paste.id);
+      });
+
+      pasteListEl.appendChild(li);
+    });
+  }
+
+  // Selecionar paste para editar
+  function selectPaste(id) {
+    const paste = pastes.find(p => p.id === id);
+    if (!paste) return;
+    selectedPasteId = id;
+    pasteTitleInput.value = paste.title || '';
+    pasteContentInput.value = paste.content || '';
+    updateShareLink(id);
+    renderPasteList();
+  }
+
+  // Criar um novo paste vazio e selecionar
+  function newPaste() {
+    selectedPasteId = null;
+    pasteTitleInput.value = '';
+    pasteContentInput.value = '';
+    shareLinkInput.value = '';
+    renderPasteList();
+    pasteTitleInput.focus();
+  }
+
+  // Salvar paste (novo ou editar)
+  function saveCurrentPaste() {
+    const title = pasteTitleInput.value.trim();
+    const content = pasteContentInput.value;
+    if (!content) {
+      alert('O conteúdo do paste não pode ser vazio.');
+      return;
+    }
+    if (selectedPasteId) {
+      // Editar existente
+      const paste = pastes.find(p => p.id === selectedPasteId);
+      if (paste) {
+        paste.title = title;
+        paste.content = content;
+      }
+    } else {
+      // Criar novo
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      pastes.push({id, title, content});
+      selectedPasteId = id;
+    }
+    savePastes();
+    renderPasteList();
+    updateShareLink(selectedPasteId);
+    alert('Paste salvo!');
+  }
+
+  // Deletar paste selecionado
+  function deletePaste(id) {
+    pastes = pastes.filter(p => p.id !== id);
+    if (selectedPasteId === id) {
+      newPaste();
+    }
+    savePastes();
+    renderPasteList();
+    shareLinkInput.value = '';
+  }
+
+  // Gerar link interno para “compartilhar”
+  // Na prática, o link fica: index.html?pasteid=xxx
+  // E ao abrir, o script carrega o paste pelo id
+  function updateShareLink(id) {
+    if(!id) {
+      shareLinkInput.value = '';
+      return;
+    }
+    const base = window.location.origin + window.location.pathname;
+    const link = base + '?pasteid=' + encodeURIComponent(id);
+    shareLinkInput.value = link;
+  }
+
+  // Ao carregar a página, verifica se existe pasteid na URL para abrir automaticamente
+  function checkUrlPaste() {
+    const params = new URLSearchParams(window.location.search);
+    const pasteid = params.get('pasteid');
+    if (pasteid) {
+      const paste = pastes.find(p => p.id === pasteid);
+      if (paste) {
+        selectPaste(pasteid);
+        return;
+      }
+    }
+    newPaste();
+  }
+
+  // Eventos
+  saveBtn.addEventListener('click', saveCurrentPaste);
+  deleteBtn.addEventListener('click', () => {
+    if(!selectedPasteId) {
+      alert('Nenhum paste selecionado para excluir.');
+      return;
+    }
+    if(confirm('Excluir este paste?')) {
+      deletePaste(selectedPasteId);
+    }
+  });
+  newPasteBtn.addEventListener('click', newPaste);
+
+  // Inicialização
+  loadPastes();
+  checkUrlPaste();
+  renderPasteList();
+</script>
+
+</body>
+</html>
