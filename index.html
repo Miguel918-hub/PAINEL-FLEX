@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kitsune Hub 🦊 - Futurista Verde + Player Custom</title>
+<style>
+  /* Reset e básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a130a;
+    color: #00ff99;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+    text-align: center;
+  }
+  header {
+    width: 100%;
+    padding: 20px 0;
+    background: linear-gradient(90deg, #003300, #006622);
+    font-size: 28px;
+    font-weight: 900;
+    border-bottom: 3px solid #00ff99;
+    text-shadow: 0 0 10px #00ff99;
+    user-select: none;
+  }
+  .buttons {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 700px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .button {
+    background: #004400;
+    border: 2px solid #00ff99;
+    padding: 14px 25px;
+    font-size: 17px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #00ff99;
+    font-weight: 700;
+    box-shadow: 0 0 15px #00ff99;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    flex: 1 1 180px;
+    min-width: 160px;
+  }
+  .button:hover {
+    background: #00ff99;
+    color: #002200;
+    box-shadow: 0 0 25px #00ff99;
+  }
+  .panel {
+    display: none;
+    width: 90%;
+    max-width: 700px;
+    background: #002200;
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 30px #00ff99;
+    margin-bottom: 40px;
+    text-align: left;
+    user-select: text;
+  }
+  textarea {
+    width: 100%;
+    height: 160px;
+    background: #001100;
+    color: #00ff99;
+    border: 1.5px solid #00ff99;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'Courier New', Courier, monospace;
+    resize: vertical;
+    font-size: 15px;
+    box-shadow: inset 0 0 6px #00ff99;
+  }
+  h2 {
+    color: #00ff99;
+    font-weight: 900;
+    margin-bottom: 15px;
+    text-shadow: 0 0 7px #00ff99;
+  }
+  #resultado, #curtorResult, #loadstringResult, #pastefyResult {
+    color: #00ff99;
+    margin-top: 15px;
+    word-wrap: break-word;
+    font-weight: 700;
+    user-select: all;
+  }
+  .music-player {
+    width: 90%;
+    max-width: 700px;
+    background: #003300;
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 30px #00ff99;
+    margin-bottom: 40px;
+    user-select: none;
+  }
+  button.music-btn {
+    width: auto;
+    margin-bottom: 15px;
+  }
+  input[type=range], input[type=file] {
+    width: 100%;
+    cursor: pointer;
+    accent-color: #00ff99;
+    margin-bottom: 15px;
+    border-radius: 8px;
+  }
+  label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #001100;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 8px #00ff99;
+    font-family: monospace;
+    font-size: 15px;
+    margin-top: 15px;
+  }
+  @media (max-width: 480px) {
+    .buttons {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .button {
+      flex: 1 1 100%;
+      min-width: unset;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>🦊 Kitsune Hub - Futurista Verde + Player Custom</header>
+
+<div class="buttons">
+  <button class="button" onclick="showPanel('pastefyPanel')">Kitsune Pastefy 🦊</button>
+  <button class="button" onclick="showPanel('loadstringPanel')">Kitsune Loadstring 🦊</button>
+  <button class="button" onclick="showPanel('curtorPanel')">Kitsune Curtor 🦊</button>
+</div>
+
+<!-- Pastefy Panel -->
+<div id="pastefyPanel" class="panel">
+  <h2>Kitsune Pastefy 🦊</h2>
+  <textarea id="pastefyScript" placeholder="Cole seu script para Pastefy..."></textarea>
+  <button class="button" onclick="savePastefy()">Salvar e Gerar Link</button>
+  <div id="pastefyResult"></div>
+</div>
+
+<!-- Loadstring Panel -->
+<div id="loadstringPanel" class="panel">
+  <h2>Kitsune Loadstring 🦊</h2>
+  <textarea id="loadstringScript" placeholder="Cole seu script para Loadstring..."></textarea>
+  <button class="button" onclick="saveLoadstring()">Salvar e Gerar Link</button>
+  <div id="loadstringResult"></div>
+</div>
+
+<!-- Curtor Panel -->
+<div id="curtorPanel" class="panel">
+  <h2>Kitsune Curtor 🦊</h2>
+  <textarea id="curtorScript" placeholder="Cole seu script para Curtor..."></textarea>
+  <button class="button" onclick="saveCurtor()">Salvar e Gerar Link</button>
+  <div id="curtorResult"></div>
+</div>
+
+<!-- Music Player -->
+<div class="music-player" role="region" aria-label="Player de música relaxante">
+  <label for="fileInput">🎵 Escolha um arquivo de música para tocar</label>
+  <input type="file" id="fileInput" accept="audio/*" aria-describedby="fileDesc" />
+  <audio id="backgroundMusic" loop></audio>
+
+  <button id="playPauseBtn" class="music-btn" aria-label="Play/Pause música" disabled>▶️ Tocar Música</button>
+
+  <label for="volumeRange">Volume</label>
+  <input type="range" id="volumeRange" min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" />
+</div>
+
+<script>
+  // Mostrar painel
+  function showPanel(id) {
+    ['pastefyPanel', 'loadstringPanel', 'curtorPanel'].forEach(pid => {
+      document.getElementById(pid).style.display = (pid === id) ? 'block' : 'none';
+    });
+  }
+
+  // Gerar ID aleatório
+  function generateId() {
+    return Math.random().toString(36).substring(2, 10);
+  }
+
+  // Salvar Pastefy
+  function savePastefy() {
+    const script = document.getElementById('pastefyScript').value.trim();
+    if (!script) return alert('Cole um script válido!');
+    const id = generateId();
+    localStorage.setItem('kitsune_pastefy_' + id, script);
+    const url = location.origin + location.pathname + '?pastefy=' + id;
+    document.getElementById('pastefyResult').innerHTML = `<p>🔗 Link gerado:</p><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a><br/><code>loadstring(game:HttpGet("${url}"))()</code>`;
+  }
+
+  // Salvar Loadstring
+  function saveLoadstring() {
+    const script = document.getElementById('loadstringScript').value.trim();
+    if (!script) return alert('Cole um script válido!');
+    const id = generateId();
+    localStorage.setItem('kitsune_loadstring_' + id, script);
+    const url = location.origin + location.pathname + '?loadstring=' + id;
+    document.getElementById('loadstringResult').innerHTML = `<p>🔗 Link gerado:</p><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a><br/><code>loadstring(game:HttpGet("${url}"))()</code>`;
+  }
+
+  // Salvar Curtor
+  function saveCurtor() {
+    const script = document.getElementById('curtorScript').value.trim();
+    if (!script) return alert('Cole um script válido!');
+    const id = generateId();
+    localStorage.setItem('kitsune_curtor_' + id, script);
+    const url = location.origin + location.pathname + '?curtor=' + id;
+    document.getElementById('curtorResult').innerHTML = `<p>🔗 Link gerado:</p><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a><br/><code>loadstring(game:HttpGet("${url}"))()</code>`;
+  }
+
+  // Mostrar script puro ao abrir link
+  (function checkUrlParams() {
+    const url = new URL(window.location.href);
+    const pastefyId = url.searchParams.get('pastefy');
+    const loadstringId = url.searchParams.get('loadstring');
+    const curtorId = url.searchParams.get('curtor');
+
+    if (pastefyId) {
+      const script = localStorage.getItem('kitsune_pastefy_' + pastefyId);
+      if (script) {
+        document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
+      } else {
+        document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script Pastefy não encontrado!</p>`;
+      }
+    } else if (loadstringId) {
+      const script = localStorage.getItem('kitsune_loadstring_' + loadstringId);
+      if (script) {
+        document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
+      } else {
+        document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script Loadstring não encontrado!</p>`;
+      }
+    } else if (curtorId) {
+      const script = localStorage.getItem('kitsune_curtor_' + curtorId);
+      if (script) {
+        document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
+      } else {
+        document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script Curtor não encontrado!</p>`;
+      }
+    }
+  })();
+
+  // Player Música com arquivo local
+  const fileInput = document.getElementById('fileInput');
+  const backgroundMusic = document.getElementById('backgroundMusic');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const volumeRange = document.getElementById('volumeRange');
+
+  // Inicializa volume
+  backgroundMusic.volume = 0.5;
+  playPauseBtn.disabled = true;
+
+  fileInput.addEventListener('change', function(){
+    const files = this.files;
+    if (files.length === 0) return;
+
+    const file = files[0];
+    const fileURL = URL.createObjectURL(file);
+
+    backgroundMusic.src = fileURL;
+    backgroundMusic.load();
+
+    backgroundMusic.play().then(() => {
+      playPauseBtn.textContent = '⏸️ Pausar Música';
+      playPauseBtn.disabled = false;
+    }).catch(() => {
+      playPauseBtn.textContent = '▶️ Tocar Música';
+      playPauseBtn.disabled = false;
+    });
+  });
+
+  playPauseBtn.addEventListener('click', () => {
+    if (backgroundMusic.paused) {
+      backgroundMusic.play();
+      playPauseBtn.textContent = '⏸️ Pausar Música';
+    } else {
+      backgroundMusic.pause();
+      playPauseBtn.textContent = '▶️ Tocar Música';
+    }
+  });
+
+  volumeRange.addEventListener('input', () => {
+    backgroundMusic.volume = volumeRange.value / 100;
+    volumeRange.setAttribute('aria-valuenow', volumeRange.value);
+  });
+
+  // Opcional: Mostrar painel inicial
+  showPanel('pastefyPanel');
+</script>
+
+</body>
+</html>
