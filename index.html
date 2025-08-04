@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kitsune Hub 🦊</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d0d0d;
+      color: #00ff99;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      padding: 20px;
+      background: #111;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 2px solid #00ff99;
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .button {
+      background: #003322;
+      color: #00ff99;
+      border: 2px solid #00ff99;
+      padding: 12px 20px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .button:hover {
+      background: #005544;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+    }
+
+    #resultado a {
+      color: #00ff99;
+      word-break: break-word;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 20px;
+      }
+      .button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>🦊 Kitsune Hub - Encurtador Roblox Futurista</header>
+
+  <div class="content">
+    <textarea id="scriptArea" placeholder="Cole aqui seu script Roblox..."></textarea>
+    <button class="button" onclick="encurtarScript()">Encurtar Script</button>
+    <div id="resultado"></div>
+    <hr style="margin: 20px 0; border-color: #00ff99;" />
+    <button class="button" onclick="abrirCurtor()">Kitsune Curtor 🦊</button>
+  </div>
+
+  <script>
+    // Salvar script e gerar URL
+    function encurtarScript() {
+      const script = document.getElementById("scriptArea").value.trim();
+      if (!script) return alert("Cole um script válido!");
+
+      const id = Math.random().toString(36).substring(2, 10);
+      localStorage.setItem("kitsune_script_" + id, script);
+
+      const link = location.origin + location.pathname + "?kitsune=" + id;
+      document.getElementById("resultado").innerHTML = `
+        <p><strong>🔗 Link gerado:</strong></p>
+        <a href="${link}" target="_blank">${link}</a><br/><br/>
+        <strong>💡 Para usar no Roblox:</strong><br/>
+        <code>loadstring(game:HttpGet("${link}"))()</code>
+      `;
+    }
+
+    // Carregar script se estiver com ?kitsune=...
+    (function verificarRaw() {
+      const url = new URL(window.location.href);
+      const id = url.searchParams.get("kitsune");
+      if (id) {
+        const script = localStorage.getItem("kitsune_script_" + id);
+        if (script) {
+          document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
+        } else {
+          document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script não encontrado!</p>`;
+        }
+      }
+    })();
+
+    function abrirCurtor() {
+      window.open(location.origin + location.pathname, "_blank");
+    }
+  </script>
+</body>
+</html>
