@@ -2,17 +2,21 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kitsune Hub 🦊</title>
   <style>
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #0d0d0d;
       color: #00ff99;
-      display: flex; flex-direction: column; align-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
     }
+
     header {
       width: 100%;
       padding: 20px;
@@ -22,12 +26,14 @@
       font-weight: bold;
       border-bottom: 2px solid #00ff99;
     }
+
     .content {
       padding: 20px;
       text-align: center;
       width: 90%;
       max-width: 600px;
     }
+
     .button {
       background: #003322;
       color: #00ff99;
@@ -40,9 +46,11 @@
       transition: all 0.3s;
       width: 100%;
     }
+
     .button:hover {
       background: #005544;
     }
+
     textarea {
       width: 100%;
       height: 180px;
@@ -52,29 +60,20 @@
       border-radius: 8px;
       padding: 10px;
       font-family: monospace;
-      resize: vertical;
-      margin-bottom: 10px;
     }
+
     #resultado a {
       color: #00ff99;
       word-break: break-word;
     }
-    #panel1, #panel2 {
-      display: none;
-      margin-top: 20px;
-      text-align: left;
-      background: #001d00;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #00ff99;
-    }
-    #panel1 textarea, #panel2 textarea {
-      height: 150px;
-    }
-    #result1, #result2 {
-      margin-top: 10px;
-      color: #00ff99;
-      word-wrap: break-word;
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 20px;
+      }
+      .button {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -82,44 +81,24 @@
   <header>🦊 Kitsune Hub - Encurtador Roblox Futurista</header>
 
   <div class="content">
-    <button class="button" onclick="togglePanel('panel1')">Encurtar Script</button>
-    <button class="button" onclick="togglePanel('panel2')">Kitsune Curtor 🦊</button>
-
-    <div id="panel1">
-      <textarea id="scriptArea1" placeholder="Cole aqui seu script Roblox..."></textarea>
-      <button class="button" onclick="encurtarScript1()">Encurtar</button>
-      <div id="result1"></div>
-    </div>
-
-    <div id="panel2">
-      <textarea id="scriptArea2" placeholder="Cole seu script para Kitsune Curtor..."></textarea>
-      <button class="button" onclick="encurtarScript2()">Encurtar Curtor</button>
-      <div id="result2"></div>
-    </div>
+    <textarea id="scriptArea" placeholder="Cole aqui seu script Roblox..."></textarea>
+    <button class="button" onclick="encurtarScript()">Encurtar Script</button>
+    <div id="resultado"></div>
+    <hr style="margin: 20px 0; border-color: #00ff99;" />
+    <button class="button" onclick="abrirCurtor()">Kitsune Curtor 🦊</button>
   </div>
 
   <script>
-    function togglePanel(panelId) {
-      const panel1 = document.getElementById('panel1');
-      const panel2 = document.getElementById('panel2');
-      if (panelId === 'panel1') {
-        panel1.style.display = panel1.style.display === 'block' ? 'none' : 'block';
-        panel2.style.display = 'none';
-      } else {
-        panel2.style.display = panel2.style.display === 'block' ? 'none' : 'block';
-        panel1.style.display = 'none';
-      }
-    }
-
-    function encurtarScript1() {
-      const script = document.getElementById("scriptArea1").value.trim();
+    // Salvar script e gerar URL
+    function encurtarScript() {
+      const script = document.getElementById("scriptArea").value.trim();
       if (!script) return alert("Cole um script válido!");
 
       const id = Math.random().toString(36).substring(2, 10);
       localStorage.setItem("kitsune_script_" + id, script);
 
       const link = location.origin + location.pathname + "?kitsune=" + id;
-      document.getElementById("result1").innerHTML = `
+      document.getElementById("resultado").innerHTML = `
         <p><strong>🔗 Link gerado:</strong></p>
         <a href="${link}" target="_blank">${link}</a><br/><br/>
         <strong>💡 Para usar no Roblox:</strong><br/>
@@ -127,38 +106,12 @@
       `;
     }
 
-    function encurtarScript2() {
-      const script = document.getElementById("scriptArea2").value.trim();
-      if (!script) return alert("Cole um script válido!");
-
-      const id = Math.random().toString(36).substring(2, 10);
-      localStorage.setItem("kitsune_curtor_" + id, script);
-
-      const link = location.origin + location.pathname + "?curtor=" + id;
-      document.getElementById("result2").innerHTML = `
-        <p><strong>🔗 Link Curtor gerado:</strong></p>
-        <a href="${link}" target="_blank">${link}</a><br/><br/>
-        <strong>💡 Para usar no Roblox:</strong><br/>
-        <code>loadstring(game:HttpGet("${link}"))()</code>
-      `;
-    }
-
-    (function verificarLinks() {
+    // Carregar script se estiver com ?kitsune=...
+    (function verificarRaw() {
       const url = new URL(window.location.href);
-      const kitsuneId = url.searchParams.get("kitsune");
-      const curtorId = url.searchParams.get("curtor");
-
-      if (kitsuneId) {
-        const script = localStorage.getItem("kitsune_script_" + kitsuneId);
-        if (script) {
-          document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
-        } else {
-          document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script não encontrado!</p>`;
-        }
-      }
-
-      if (curtorId) {
-        const script = localStorage.getItem("kitsune_curtor_" + curtorId);
+      const id = url.searchParams.get("kitsune");
+      if (id) {
+        const script = localStorage.getItem("kitsune_script_" + id);
         if (script) {
           document.body.innerHTML = `<pre style="color:#0f0;background:#000;padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${script}</pre>`;
         } else {
@@ -166,6 +119,10 @@
         }
       }
     })();
+
+    function abrirCurtor() {
+      window.open(location.origin + location.pathname, "_blank");
+    }
   </script>
 </body>
 </html>
