@@ -122,7 +122,6 @@
   </div>
 
   <script>
-    // Função para salvar script e gerar link
     function encurtarScript() {
       const script = document.getElementById("scriptArea").value.trim();
       if (!script) return alert("Cole um script válido!");
@@ -130,18 +129,21 @@
       const id = Math.random().toString(36).substring(2, 10);
       localStorage.setItem("kitsune_script_" + id, script);
 
-      // Aqui poderia pedir o nome da pasta para salvar também
       const folder = prompt("Digite o nome da pasta para salvar (ex: Test, MeuScript):", "test") || "test";
 
-      const link = `${location.origin}${location.pathname}?kitsune=${id}&folder=${encodeURIComponent(folder)}`;
+      const baseUrl = `${location.origin}${location.pathname}`;
+      const normalLink = `${baseUrl}?kitsune=${id}&folder=${encodeURIComponent(folder)}`;
+      const rawLink = `${normalLink}&raw=1`;
 
       document.getElementById("resultado").innerHTML = `
         <p><strong>🔗 Link gerado:</strong></p>
-        <a href="${link}" target="_blank">${link}</a><br/><br/>
+        <a href="${normalLink}" target="_blank">${normalLink}</a><br/><br/>
+        <p><strong>🔗 Link RAW para Roblox (use no loadstring):</strong></p>
+        <a href="${rawLink}" target="_blank">${rawLink}</a><br/><br/>
         <strong>💡 Para usar no Roblox:</strong><br/>
-        <code>loadstring(game:HttpGet("${link}"))()</code>
+        <code>loadstring(game:HttpGet("${rawLink}"))()</code>
         <br/><br/>
-        <button class="copy-button" onclick="copiarLoadstring('${link}')">📋 Copiar loadstring</button>
+        <button class="copy-button" onclick="copiarLoadstring('${rawLink}')">📋 Copiar loadstring</button>
       `;
     }
 
@@ -152,15 +154,31 @@
       });
     }
 
-    // Função para mostrar página raw (script puro) estilo Pastefy, sem tema verde, com nome da pasta
     (function verificarRaw() {
       const url = new URL(window.location.href);
       const id = url.searchParams.get("kitsune");
       const folder = url.searchParams.get("folder") || "test";
+      const isRaw = url.searchParams.get("raw") === "1";
 
       if (id) {
         const script = localStorage.getItem("kitsune_script_" + id);
-        if (script) {
+        if (!script) {
+          document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script não encontrado!</p>`;
+          return;
+        }
+
+        if (isRaw) {
+          // Puro script, sem HTML, só texto (para Roblox)
+          document.body.style.background = "#fff";
+          document.body.style.color = "#000";
+          document.body.style.margin = "0";
+          document.body.style.padding = "20px";
+          document.body.style.fontFamily = "monospace";
+
+          // Imprime apenas o script cru, sem tags
+          document.body.textContent = script;
+        } else {
+          // Página normal mostrando raw bonitinho com pasta e botão copiar
           document.body.style.background = "#fff";
           document.body.style.color = "#000";
           document.body.style.margin = "0";
@@ -171,19 +189,15 @@
             <button class="copy-button" id="copyRawBtn">📋 Copiar Script</button>
             <pre>${escapeHtml(script)}</pre>
           `;
-
           document.getElementById("copyRawBtn").addEventListener("click", () => {
             navigator.clipboard.writeText(script).then(() => {
               alert("Script copiado para a área de transferência!");
             });
           });
-        } else {
-          document.body.innerHTML = `<p style="color:red;padding:20px;">❌ Script não encontrado!</p>`;
         }
       }
     })();
 
-    // Função simples para escapar HTML (segurança)
     function escapeHtml(text) {
       return text
         .replace(/&/g, "&amp;")
