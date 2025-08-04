@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kitsune Pastefy 🦊</title>
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --green: #00ff88;
+      --neon: #00ff88;
+      --text: #ffffff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background-color: rgba(0, 255, 136, 0.1);
+      border-bottom: 2px solid var(--green);
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      color: var(--neon);
+      font-weight: bold;
+      box-shadow: 0 0 15px var(--green);
+    }
+
+    .content {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid var(--green);
+      background-color: #101010;
+      color: var(--text);
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    button {
+      background: var(--neon);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--green);
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #loadstringBox {
+      display: none;
+      background-color: #0f0f0f;
+      border: 2px solid var(--green);
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+
+    #languageSelect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #0c0c0c;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    #languageSelect button {
+      margin: 10px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .header {
+        font-size: 22px;
+      }
+      button {
+        font-size: 16px;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">🦊 Kitsune Pastefy</div>
+
+  <div id="languageSelect">
+    <p>Choose your language / Escolha seu idioma:</p>
+    <button onclick="setLanguage('pt')">🇧🇷 Português</button>
+    <button onclick="setLanguage('en')">🇺🇸 English</button>
+  </div>
+
+  <div class="content" id="mainContent" style="display:none;">
+    <input type="text" id="pasteTitle" placeholder="Title / Título" />
+    <textarea id="pasteContent" rows="10" placeholder="Your code here... / Seu código aqui..."></textarea>
+    <button onclick="savePaste()">📥 Salvar / Save</button>
+    <button onclick="showLoadstring()">🦊 Kitsune Loadstring</button>
+
+    <div id="loadstringBox">
+      <h3>Kitsune Loadstring 🦊</h3>
+      <p id="loadstringCode"></p>
+    </div>
+  </div>
+
+  <script>
+    const lang = localStorage.getItem("lang");
+
+    if (window.location.search.includes("raw=")) {
+      const pasteId = new URLSearchParams(window.location.search).get("raw");
+      const isOwner = localStorage.getItem("paste_" + pasteId);
+      const isRoblox = navigator.userAgent.includes("Roblox");
+
+      if (!isOwner && !isRoblox) {
+        document.body.innerHTML = "<div style='padding:30px; color:red; font-size:20px;'>⛔️ Acesso restrito à pasta RAW.</div>";
+      } else {
+        const data = localStorage.getItem("paste_" + pasteId);
+        document.body.innerHTML = `<pre style="white-space:pre-wrap;color:#00ff88;padding:20px">${data || "⚠️ Paste não encontrado."}</pre>`;
+      }
+    }
+
+    function setLanguage(selected) {
+      localStorage.setItem("lang", selected);
+      document.getElementById("languageSelect").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+
+      // Traduzir textos se necessário
+      if (selected === "pt") {
+        document.getElementById("pasteTitle").placeholder = "Título";
+        document.getElementById("pasteContent").placeholder = "Seu código aqui...";
+        document.querySelector("button[onclick='savePaste()']").innerText = "📥 Salvar";
+        document.querySelector("button[onclick='showLoadstring()']").innerText = "🦊 Kitsune Loadstring";
+      } else {
+        document.getElementById("pasteTitle").placeholder = "Title";
+        document.getElementById("pasteContent").placeholder = "Your code here...";
+        document.querySelector("button[onclick='savePaste()']").innerText = "📥 Save";
+        document.querySelector("button[onclick='showLoadstring()']").innerText = "🦊 Kitsune Loadstring";
+      }
+    }
+
+    if (lang) {
+      document.getElementById("languageSelect").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      setLanguage(lang);
+    }
+
+    function savePaste() {
+      const id = Math.random().toString(36).substring(2, 10);
+      const content = document.getElementById("pasteContent").value;
+      localStorage.setItem("paste_" + id, content);
+      alert("🦊 Paste salvo! ID: " + id);
+    }
+
+    function showLoadstring() {
+      const lastKey = Object.keys(localStorage).filter(k => k.startsWith("paste_")).pop();
+      const pasteId = lastKey?.replace("paste_", "");
+      const loadstring = `loadstring(game:HttpGet("https://seusite.com?raw=${pasteId}"))()`;
+      document.getElementById("loadstringCode").innerText = loadstring;
+      document.getElementById("loadstringBox").style.display = "block";
+    }
+  </script>
+</body>
+</html>
