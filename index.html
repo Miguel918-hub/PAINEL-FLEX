@@ -1,133 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>🦊 Kitsune Hub - Editor e Salvamento de Scripts</title>
-<style>
-  body {
-    background: #121212;
-    color: #eee;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 20px;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  #warning {
-    background: #b33;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    text-align: center;
-  }
-  textarea {
-    width: 100%;
-    height: 200px;
-    background: #222;
-    color: #eee;
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 14px;
-    resize: vertical;
-  }
-  button {
-    background: #4a90e2;
-    border: none;
-    padding: 10px 16px;
-    margin-top: 10px;
-    border-radius: 6px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    user-select: none;
-  }
-  button:hover {
-    background: #357ABD;
-  }
-  #savedScripts {
-    margin-top: 20px;
-    list-style: none;
-    padding: 0;
-  }
-  #savedScripts li {
-    background: #222;
-    margin-bottom: 8px;
-    padding: 10px;
-    border-radius: 6px;
-    word-break: break-word;
-    cursor: pointer;
-  }
-  #savedScripts li:hover {
-    background: #444;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Kitsune Obfuscador 🦊</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: monospace;
+      padding: 20px;
+      text-align: center;
+    }
+    textarea {
+      width: 90%;
+      height: 200px;
+      background: #222;
+      color: #0f0;
+      border: 1px solid #555;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #ff5500;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #333;
+    }
+  </style>
 </head>
 <body>
 
-<h1>🦊 Kitsune Hub - Editor de Scripts Roblox</h1>
+  <h1>🦊 Kitsune Hub | Obfuscador de Script</h1>
 
-<div id="warning">
-  ⚠️ **IMPORTANTE:** Antes de salvar, use o <a href="https://wearedevs.net/obfuscator" target="_blank" style="color:#ffd700;">WeAreDevs Obfuscator</a> para proteger seu script!
-</div>
+  <textarea id="scriptInput" placeholder="Cole aqui seu script Roblox (LocalScript)..."></textarea><br>
 
-<textarea id="scriptInput" placeholder="Cole seu script Roblox local Lua aqui..."></textarea>
-<br />
-<button id="saveBtn">Salvar Script</button>
+  <button onclick="obfuscateScript()">Obfuscar & Gerar Loadstring</button>
+  <br>
+  <input type="text" id="loadstringOutput" readonly placeholder="Loadstring aparecerá aqui...">
+  <br>
+  <button onclick="copyLoadstring()">Copiar Loadstring</button>
 
-<h2>Scripts Salvos</h2>
-<ul id="savedScripts"></ul>
+  <script>
+    function obfuscateScript() {
+      const input = document.getElementById('scriptInput').value.trim();
+      if (!input) return alert("Cole um script antes!");
 
-<script>
-  const scriptInput = document.getElementById('scriptInput');
-  const saveBtn = document.getElementById('saveBtn');
-  const savedScriptsList = document.getElementById('savedScripts');
+      // Obfuscador básico (não muito seguro, mas protege contra cópia rápida)
+      const base64 = btoa(input); // codifica em base64
 
-  let savedScripts = JSON.parse(localStorage.getItem('kitsuneScripts') || '[]');
+      const loadstring = `loadstring(game:HttpGet("data:text/plain;base64,${base64}", true))()`;
 
-  function renderSavedScripts() {
-    savedScriptsList.innerHTML = '';
-    if (savedScripts.length === 0) {
-      savedScriptsList.innerHTML = '<li style="color:#555;cursor:default;">Nenhum script salvo.</li>';
-      return;
-    }
-    savedScripts.forEach((scriptObj, index) => {
-      const li = document.createElement('li');
-      li.textContent = scriptObj.name || `Script ${index + 1}`;
-      li.title = 'Clique para ver o script';
-      li.addEventListener('click', () => {
-        scriptInput.value = scriptObj.content;
-        window.scrollTo(0, 0);
-      });
-      savedScriptsList.appendChild(li);
-    });
-  }
-
-  saveBtn.addEventListener('click', () => {
-    const content = scriptInput.value.trim();
-    if (!content) {
-      alert('O conteúdo do script não pode ser vazio.');
-      return;
+      document.getElementById('loadstringOutput').value = loadstring;
     }
 
-    // Pergunta o nome do script (pasta)
-    const name = prompt('Digite um nome para o script/pasta:', `Script ${savedScripts.length + 1}`) || `Script ${savedScripts.length + 1}`;
-
-    savedScripts.push({ name, content });
-    localStorage.setItem('kitsuneScripts', JSON.stringify(savedScripts));
-
-    alert('Script salvo localmente! Lembre-se de usar o obfuscator para proteger.');
-
-    scriptInput.value = '';
-    renderSavedScripts();
-  });
-
-  renderSavedScripts();
-</script>
+    function copyLoadstring() {
+      const output = document.getElementById('loadstringOutput');
+      output.select();
+      document.execCommand('copy');
+      alert('Loadstring copiado!');
+    }
+  </script>
 
 </body>
 </html>
