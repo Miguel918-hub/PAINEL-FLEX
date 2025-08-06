@@ -6,7 +6,7 @@
       saveBtn: "Save Script",
       deleteBtn: "Delete Script",
       newPasteBtn: "New Script",
-      shareLinkPlaceholder: "The link to use in Roblox will appear here...",
+      shareLinkPlaceholder: "Your Roblox loadstring will appear here...",
       noScripts: "No scripts saved.",
       confirmLangBtn: "Confirm / Confirmar",
       langInputPlaceholder: "Type your language (e.g. English, Português)",
@@ -21,7 +21,7 @@
       saveBtn: "Salvar Script",
       deleteBtn: "Excluir Script",
       newPasteBtn: "Novo Script",
-      shareLinkPlaceholder: "O link para usar no Roblox aparecerá aqui...",
+      shareLinkPlaceholder: "Seu loadstring do Roblox aparecerá aqui...",
       noScripts: "Nenhum script salvo.",
       confirmLangBtn: "Confirmar",
       langInputPlaceholder: "Digite seu idioma (ex: English, Português)",
@@ -32,13 +32,11 @@
     }
   };
 
-  // Elementos tela idioma e app
   const languageSelect = document.getElementById('languageSelect');
   const mainApp = document.getElementById('mainApp');
   const languageInput = document.getElementById('languageInput');
   const confirmLangBtn = document.getElementById('confirmLangBtn');
 
-  // Elementos editor
   const pasteListEl = document.getElementById('pasteList');
   const pasteContentInput = document.getElementById('pasteContentInput');
   const saveBtn = document.getElementById('saveBtn');
@@ -51,12 +49,10 @@
   let selectedPasteId = null;
   let currentLang = 'english';
 
-  // Função para adicionar " | Hospedado Kitsune Hub" ao nome da pasta
   function formatPasteId(rawId) {
     return rawId + " | Hospedado Kitsune Hub";
   }
 
-  // Aplicar traduções na interface
   function applyLanguage(lang) {
     const tr = translations[lang];
     titleEl.textContent = tr.title;
@@ -68,20 +64,14 @@
     languageInput.placeholder = tr.langInputPlaceholder;
     confirmLangBtn.textContent = tr.confirmLangBtn;
     languageSelect.querySelector('h1').textContent = tr.chooseLangTitle;
-
     renderPasteList();
   }
 
-  // Load pastes do localStorage
   function loadPastes() {
     const saved = localStorage.getItem('kitsune_pastes');
-    if (saved) {
-      try {
-        pastes = JSON.parse(saved);
-      } catch {
-        pastes = [];
-      }
-    } else {
+    try {
+      pastes = saved ? JSON.parse(saved) : [];
+    } catch {
       pastes = [];
     }
   }
@@ -105,7 +95,6 @@
 
       li.addEventListener('click', () => selectPaste(paste.id));
 
-      // Botão excluir
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
       delBtn.className = 'deleteBtn';
@@ -117,7 +106,6 @@
         }
       });
       li.appendChild(delBtn);
-
       pasteListEl.appendChild(li);
     });
   }
@@ -161,6 +149,7 @@
     } else {
       pastes.push({ id: selectedPasteId, content });
     }
+
     savePastes();
     renderPasteList();
     updateShareLink(selectedPasteId);
@@ -169,9 +158,7 @@
 
   function deletePaste(id) {
     pastes = pastes.filter(p => p.id !== id);
-    if (selectedPasteId === id) {
-      newPaste();
-    }
+    if (selectedPasteId === id) newPaste();
     savePastes();
     renderPasteList();
     shareLinkInput.value = '';
@@ -182,16 +169,19 @@
       shareLinkInput.value = '';
       return;
     }
-    const baseUrl = location.origin + location.pathname;
-    // No link só o id cru, sem o | Hospedado Kitsune Hub para facilitar o uso no Roblox
-    shareLinkInput.value = `${baseUrl}?id=${encodeURIComponent(id)}`;
+
+    const paste = pastes.find(p => p.id === id);
+    if (!paste) return;
+
+    const base64 = btoa(unescape(encodeURIComponent(paste.content)));
+    shareLinkInput.value = `loadstring(game:HttpGet("data:text/plain;base64,${base64}"))()`;
   }
 
-  // Verifica se está no modo raw (mostrar só o script)
   function checkRawView() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (id) {
+      loadPastes();
       const paste = pastes.find(p => p.id === id);
       if (paste) {
         document.body.innerHTML = '';
@@ -204,7 +194,7 @@
         pre.style.fontSize = '1.1em';
         pre.style.maxWidth = '900px';
         pre.style.margin = '20px auto';
-        pre.textContent = paste.content;
+        pre.textContent = btoa(unescape(encodeURIComponent(paste.content)));
         document.body.appendChild(pre);
         return true;
       } else {
@@ -215,36 +205,22 @@
     return false;
   }
 
-  // Ao clicar no botão confirmar idioma
   confirmLangBtn.addEventListener('click', () => {
     const lang = languageInput.value.toLowerCase().trim();
     if (!lang) return alert('Please type a language / Por favor, digite um idioma.');
     currentLang = translations[lang] ? lang : 'english';
-
-    // Salva idioma no localStorage
     localStorage.setItem('kitsune_lang', currentLang);
-
-    // Aplica tradução
     applyLanguage(currentLang);
-
-    // Esconde tela idioma, mostra app
     languageSelect.classList.remove('active');
     mainApp.classList.add('active');
-
-    // Inicializa editor
     loadPastes();
     renderPasteList();
     newPaste();
   });
 
-  // Na inicialização da página
   window.addEventListener('load', () => {
     loadPastes();
-
-    // Verifica se está na view raw, se sim mostra só script e para
     if (checkRawView()) return;
-
-    // Se tiver idioma salvo, pula a tela de idioma direto
     const savedLang = localStorage.getItem('kitsune_lang');
     if (savedLang && translations[savedLang]) {
       currentLang = savedLang;
@@ -254,13 +230,11 @@
       renderPasteList();
       newPaste();
     } else {
-      // Senão, mostra a tela de seleção de idioma
       languageSelect.classList.add('active');
       mainApp.classList.remove('active');
     }
   });
 
-  // Botões editor
   saveBtn.addEventListener('click', saveCurrentPaste);
   deleteBtn.addEventListener('click', () => {
     if (!selectedPasteId) {
@@ -272,5 +246,4 @@
     }
   });
   newPasteBtn.addEventListener('click', newPaste);
-
 })();
