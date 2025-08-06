@@ -1,155 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kitsune Loadstring 🦊</title>
-  <style>
-    :root {
-      --bg-color: #0f0f0f;
-      --card-color: #1a1a1a;
-      --accent-color: cyan;
-      --text-color: white;
-    }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background: var(--card-color);
-      border-radius: 12px;
-      box-shadow: 0 0 20px var(--accent-color);
-      padding: 40px;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 28px;
-    }
-
-    select, input, button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 15px;
-      box-sizing: border-box;
-    }
-
-    select {
-      background: #111;
-      color: var(--text-color);
-    }
-
-    input {
-      background: #222;
-      color: var(--text-color);
-    }
-
-    button {
-      background: var(--accent-color);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.03);
-      background: white;
-    }
-
-    #result {
-      background: #0a0a0a;
-      margin-top: 25px;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      word-wrap: break-word;
-      text-align: left;
-    }
-
-    code {
-      background: #222;
-      color: cyan;
-      padding: 6px;
-      display: block;
-      border-radius: 6px;
-      margin-top: 10px;
-      font-size: 15px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🦊 Kitsune Hub - Editor e Salvamento de Scripts</title>
+<style>
+  body {
+    background: #121212;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  #warning {
+    background: #b33;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+  }
+  textarea {
+    width: 100%;
+    height: 200px;
+    background: #222;
+    color: #eee;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+  }
+  button {
+    background: #4a90e2;
+    border: none;
+    padding: 10px 16px;
+    margin-top: 10px;
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  button:hover {
+    background: #357ABD;
+  }
+  #savedScripts {
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+  }
+  #savedScripts li {
+    background: #222;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    word-break: break-word;
+    cursor: pointer;
+  }
+  #savedScripts li:hover {
+    background: #444;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Kitsune Loadstring 🦊</h1>
 
-    <select id="langSelect">
-      <option value="pt">🇧🇷 Português (Brasil)</option>
-      <option value="en">🇺🇸 English (USA)</option>
-    </select>
+<h1>🦊 Kitsune Hub - Editor de Scripts Roblox</h1>
 
-    <input type="text" id="pasteName" placeholder="Digite o nome da pasta...">
-    <button onclick="generateLink()">Gerar Link Loadstring</button>
+<div id="warning">
+  ⚠️ **IMPORTANTE:** Antes de salvar, use o <a href="https://wearedevs.net/obfuscator" target="_blank" style="color:#ffd700;">WeAreDevs Obfuscator</a> para proteger seu script!
+</div>
 
-    <div id="result"></div>
-  </div>
+<textarea id="scriptInput" placeholder="Cole seu script Roblox local Lua aqui..."></textarea>
+<br />
+<button id="saveBtn">Salvar Script</button>
 
-  <script>
-    const lang = {
-      pt: {
-        placeholder: "Digite o nome da pasta...",
-        button: "Gerar Link Loadstring",
-        result: nome => `
-        ✅ Copie este código e cole no seu script Roblox:<br>
-        <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${nome}"))()</code>`
-      },
-      en: {
-        placeholder: "Enter folder name...",
-        button: "Generate Loadstring Link",
-        result: name => `
-        ✅ Copy and paste this in your Roblox script:<br>
-        <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${name}"))()</code>`
-      }
-    };
+<h2>Scripts Salvos</h2>
+<ul id="savedScripts"></ul>
 
-    function generateLink() {
-      const langVal = document.getElementById("langSelect").value;
-      const pasteName = document.getElementById("pasteName").value.trim();
+<script>
+  const scriptInput = document.getElementById('scriptInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const savedScriptsList = document.getElementById('savedScripts');
 
-      if (!pasteName) {
-        alert("⚠️ Preencha o nome da pasta primeiro.");
-        return;
-      }
+  let savedScripts = JSON.parse(localStorage.getItem('kitsuneScripts') || '[]');
 
-      document.getElementById("result").innerHTML = lang[langVal].result(pasteName);
+  function renderSavedScripts() {
+    savedScriptsList.innerHTML = '';
+    if (savedScripts.length === 0) {
+      savedScriptsList.innerHTML = '<li style="color:#555;cursor:default;">Nenhum script salvo.</li>';
+      return;
+    }
+    savedScripts.forEach((scriptObj, index) => {
+      const li = document.createElement('li');
+      li.textContent = scriptObj.name || `Script ${index + 1}`;
+      li.title = 'Clique para ver o script';
+      li.addEventListener('click', () => {
+        scriptInput.value = scriptObj.content;
+        window.scrollTo(0, 0);
+      });
+      savedScriptsList.appendChild(li);
+    });
+  }
+
+  saveBtn.addEventListener('click', () => {
+    const content = scriptInput.value.trim();
+    if (!content) {
+      alert('O conteúdo do script não pode ser vazio.');
+      return;
     }
 
-    // Mudar idioma dinâmico
-    document.getElementById("langSelect").addEventListener("change", function () {
-      const selectedLang = this.value;
-      document.getElementById("pasteName").placeholder = lang[selectedLang].placeholder;
-      document.querySelector("button").textContent = lang[selectedLang].button;
-    });
-  </script>
+    // Pergunta o nome do script (pasta)
+    const name = prompt('Digite um nome para o script/pasta:', `Script ${savedScripts.length + 1}`) || `Script ${savedScripts.length + 1}`;
+
+    savedScripts.push({ name, content });
+    localStorage.setItem('kitsuneScripts', JSON.stringify(savedScripts));
+
+    alert('Script salvo localmente! Lembre-se de usar o obfuscator para proteger.');
+
+    scriptInput.value = '';
+    renderSavedScripts();
+  });
+
+  renderSavedScripts();
+</script>
+
 </body>
 </html>
