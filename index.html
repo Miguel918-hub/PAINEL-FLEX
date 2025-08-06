@@ -1,146 +1,110 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kitsune Hub 🦊</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kitsune Loadstring 🦊</title>
   <style>
-    /* Futurista verde */
-    body.futurista {
-      margin:0; padding:0;
-      font-family:'Segoe UI',sans-serif;
-      background:#0a130a; color:#00ff99;
-      display:flex; flex-direction:column; align-items:center;
-      min-height:100vh; text-align:center;
+    body {
+      background: linear-gradient(to right, #0f0f0f, #1a1a1a);
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      padding: 30px;
+      margin: 0;
     }
-    header.futurista {
-      width:100%;
-      padding:20px;
-      background: linear-gradient(90deg,#003300,#006622);
-      font-size:28px; font-weight:900;
-      color:#00ff99;
-      border-bottom:3px solid #00ff99;
-      text-shadow:0 0 10px #00ff99; user-select:none;
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background-color: #181818;
+      border-radius: 10px;
+      box-shadow: 0 0 10px cyan;
     }
-    .buttons {
-      margin:20px auto; width:90%;max-width:700px;
-      display:flex; gap:10px; flex-wrap:wrap;
-      justify-content:center;
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
     }
-    .button {
-      background:#004400; border:2px solid #00ff99;
-      padding:14px 25px; font-size:17px; border-radius:12px;
-      color:#00ff99; font-weight:700; box-shadow:0 0 15px #00ff99;
-      cursor:pointer; transition:background 0.3s,box-shadow 0.3s;
-      flex:1 1 180px; min-width:160px;
+
+    button {
+      background-color: cyan;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .button:hover {
-      background:#00ff99; color:#002200;
-      box-shadow:0 0 25px #00ff99;
+
+    #result {
+      margin-top: 20px;
+      word-wrap: break-word;
+      background: #0e0e0e;
+      padding: 10px;
+      border-radius: 8px;
     }
-    .panel {
-      display:none; width:90%; max-width:700px;
-      background:#002200; border:2px solid #00ff99;
-      border-radius:15px; padding:20px; box-shadow:0 0 30px #00ff99;
-      margin-bottom:40px; text-align:left;
-    }
-    textarea {
-      width:100%; height:150px;
-      background:#001100; color:#00ff99;
-      border:1.5px solid #00ff99; border-radius:12px;
-      padding:12px; font-family:monospace;
-      font-size:15px; resize:vertical;
-      box-shadow: inset 0 0 6px #00ff99;
-    }
-    h2 { color:#00ff99; font-weight:900; margin-bottom:15px;
-         text-shadow:0 0 7px #00ff99; }
-    .result { color:#00ff99; margin-top:15px; word-wrap:break-word; font-weight:700; }
-    /* RAW view limpar */
-    body.raw { margin:1rem; background:#fff; color:#111; font-family:Consolas,monospace; text-align:left; }
-    pre.raw {
-      background:#eee; border:1px solid #ccc; padding:1rem;
-      border-radius:4px; white-space:pre-wrap; word-break:break-word;
-      font-size:14px; line-height:1.4;
+
+    .lang {
+      margin-bottom: 20px;
     }
   </style>
 </head>
-<body class="futurista">
-  <header id="pageHeader" class="futurista">🦊 Kitsune Hub – Developer / Owner / WebSiteDesigner</header>
+<body>
+  <div class="container">
+    <h1>Kitsune Loadstring 🦊</h1>
 
-  <div id="mainContent" class="futurista">
-    <div class="buttons">
-      <button class="button" onclick="showPanel('pastefy')">Kitsune Pastefy 🦊</button>
-      <button class="button" onclick="showPanel('loadstring')">Kitsune Loadstring 🦊</button>
-      <button class="button" onclick="showPanel('curtor')">Kitsune Curtor 🦊</button>
+    <div class="lang">
+      <select id="langSelect">
+        <option value="pt">🇧🇷 Português (Brasil)</option>
+        <option value="en">🇺🇸 English (USA)</option>
+      </select>
     </div>
 
-    <div id="pastefy" class="panel">
-      <h2>Kitsune Pastefy 🦊</h2>
-      <textarea id="txtPastefy" placeholder="Cole seu script aqui"></textarea>
-      <button class="button" onclick="save('pastefy')">Salvar e Gerar Link</button>
-      <div id="resPastefy" class="result"></div>
+    <div>
+      <input type="text" id="pasteName" placeholder="Digite o nome da pasta...">
+      <button onclick="generateLink()">Gerar Link Loadstring</button>
     </div>
 
-    <div id="loadstring" class="panel">
-      <h2>Kitsune Loadstring 🦊</h2>
-      <textarea id="txtLoadstring" placeholder="Cole seu script aqui"></textarea>
-      <button class="button" onclick="save('loadstring')">Salvar e Gerar Link</button>
-      <div id="resLoadstring" class="result"></div>
-    </div>
-
-    <div id="curtor" class="panel">
-      <h2>Kitsune Curtor 🦊</h2>
-      <textarea id="txtCurtor" placeholder="Cole seu script aqui"></textarea>
-      <button class="button" onclick="save('curtor')">Salvar e Gerar Link</button>
-      <div id="resCurtor" class="result"></div>
-    </div>
+    <div id="result"></div>
   </div>
 
-<script>
-  function showPanel(id) {
-    ['pastefy','loadstring','curtor'].forEach(p=>{
-      document.getElementById(p).style.display = (p===id?'block':'none');
-    });
-  }
+  <script>
+    const lang = {
+      pt: {
+        placeholder: "Digite o nome da pasta...",
+        button: "Gerar Link Loadstring",
+        result: nome => `
+          ✅ Copie este código para usar no Roblox:<br><br>
+          <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${nome}"))()</code>
+        `
+      },
+      en: {
+        placeholder: "Enter folder name...",
+        button: "Generate Loadstring Link",
+        result: name => `
+          ✅ Copy this code to use in Roblox:<br><br>
+          <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${name}"))()</code>
+        `
+      }
+    };
 
-  function generateId() { return prompt("Nome da pasta?"); }
+    function generateLink() {
+      const langVal = document.getElementById("langSelect").value;
+      const pasteName = document.getElementById("pasteName").value.trim();
 
-  function save(type){
-    const txt = document.getElementById('txt'+capitalize(type)).value.trim();
-    if(!txt) return alert("Cole o script primeiro.");
-    const folder = generateId();
-    if(!folder) return alert("Pasta inválida.");
+      if (!pasteName) return alert("Digite o nome da pasta!");
 
-    const obj = JSON.parse(localStorage.getItem('kitsune_folder_' + folder) || '{}');
-    obj.name = folder;
-    obj.scripts = obj.scripts||{};
-    obj.scripts[type] = txt;
-    localStorage.setItem('kitsune_folder_' + folder, JSON.stringify(obj));
-
-    const link = location.origin + location.pathname + '?raw=' + encodeURIComponent(folder);
-    document.getElementById('res'+capitalize(type)).innerHTML =
-      `🔗 Link RAW da pasta <b>${folder}</b>:<br><a href="${link}" target="_blank">${link}</a><br><br>` +
-      `Use no Roblox:<br><code>loadstring(game:HttpGet("${link}"))()</code>`;
-  }
-
-  function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-
-  (function checkRaw(){
-    const f = new URL(location.href).searchParams.get('raw');
-    if(!f) return;
-    const data = localStorage.getItem('kitsune_folder_' + f);
-    if(!data) {
-      document.body.className='raw'; document.body.innerHTML=`<p>❌ Pasta "${f}" não encontrada.</p>`;
-      return;
+      document.getElementById("result").innerHTML = lang[langVal].result(pasteName);
     }
-    const obj = JSON.parse(data);
-    const name = obj.name;
-    const script = obj.scripts.pastefy||obj.scripts.loadstring||obj.scripts.curtor;
-    document.body.className='raw';
-    document.body.innerHTML = `<header class="raw">${name}</header><pre class="raw">${script}</pre>`;
-  })();
 
-  showPanel('pastefy');
-</script>
+    document.getElementById("langSelect").addEventListener("change", (e) => {
+      const l = lang[e.target.value];
+      document.getElementById("pasteName").placeholder = l.placeholder;
+      document.querySelector("button").textContent = l.button;
+    });
+  </script>
 </body>
 </html>
