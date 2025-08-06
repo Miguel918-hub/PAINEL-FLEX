@@ -1,54 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kitsune Loadstring 🦊</title>
   <style>
+    :root {
+      --bg-color: #0f0f0f;
+      --card-color: #1a1a1a;
+      --accent-color: cyan;
+      --text-color: white;
+    }
+
     body {
-      background: linear-gradient(to right, #0f0f0f, #1a1a1a);
-      font-family: Arial, sans-serif;
-      color: white;
-      text-align: center;
-      padding: 30px;
       margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
     }
 
     .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background-color: #181818;
-      border-radius: 10px;
-      box-shadow: 0 0 10px cyan;
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-color);
+      border-radius: 12px;
+      box-shadow: 0 0 20px var(--accent-color);
+      padding: 40px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    input, select, button {
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    select, input, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
+      padding: 14px;
       font-size: 16px;
       border: none;
       border-radius: 8px;
+      margin-top: 15px;
+      box-sizing: border-box;
+    }
+
+    select {
+      background: #111;
+      color: var(--text-color);
+    }
+
+    input {
+      background: #222;
+      color: var(--text-color);
     }
 
     button {
-      background-color: cyan;
-      color: black;
+      background: var(--accent-color);
+      color: #000;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      background: white;
     }
 
     #result {
-      margin-top: 20px;
-      word-wrap: break-word;
-      background: #0e0e0e;
-      padding: 10px;
+      background: #0a0a0a;
+      margin-top: 25px;
+      padding: 15px;
       border-radius: 8px;
+      font-size: 14px;
+      word-wrap: break-word;
+      text-align: left;
     }
 
-    .lang {
-      margin-bottom: 20px;
+    code {
+      background: #222;
+      color: cyan;
+      padding: 6px;
+      display: block;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -56,17 +103,13 @@
   <div class="container">
     <h1>Kitsune Loadstring 🦊</h1>
 
-    <div class="lang">
-      <select id="langSelect">
-        <option value="pt">🇧🇷 Português (Brasil)</option>
-        <option value="en">🇺🇸 English (USA)</option>
-      </select>
-    </div>
+    <select id="langSelect">
+      <option value="pt">🇧🇷 Português (Brasil)</option>
+      <option value="en">🇺🇸 English (USA)</option>
+    </select>
 
-    <div>
-      <input type="text" id="pasteName" placeholder="Digite o nome da pasta...">
-      <button onclick="generateLink()">Gerar Link Loadstring</button>
-    </div>
+    <input type="text" id="pasteName" placeholder="Digite o nome da pasta...">
+    <button onclick="generateLink()">Gerar Link Loadstring</button>
 
     <div id="result"></div>
   </div>
@@ -77,17 +120,15 @@
         placeholder: "Digite o nome da pasta...",
         button: "Gerar Link Loadstring",
         result: nome => `
-          ✅ Copie este código para usar no Roblox:<br><br>
-          <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${nome}"))()</code>
-        `
+        ✅ Copie este código e cole no seu script Roblox:<br>
+        <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${nome}"))()</code>`
       },
       en: {
         placeholder: "Enter folder name...",
         button: "Generate Loadstring Link",
         result: name => `
-          ✅ Copy this code to use in Roblox:<br><br>
-          <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${name}"))()</code>
-        `
+        ✅ Copy and paste this in your Roblox script:<br>
+        <code>loadstring(game:HttpGet("https://mingau.apps.github.io/raw/${name}"))()</code>`
       }
     };
 
@@ -95,15 +136,19 @@
       const langVal = document.getElementById("langSelect").value;
       const pasteName = document.getElementById("pasteName").value.trim();
 
-      if (!pasteName) return alert("Digite o nome da pasta!");
+      if (!pasteName) {
+        alert("⚠️ Preencha o nome da pasta primeiro.");
+        return;
+      }
 
       document.getElementById("result").innerHTML = lang[langVal].result(pasteName);
     }
 
-    document.getElementById("langSelect").addEventListener("change", (e) => {
-      const l = lang[e.target.value];
-      document.getElementById("pasteName").placeholder = l.placeholder;
-      document.querySelector("button").textContent = l.button;
+    // Mudar idioma dinâmico
+    document.getElementById("langSelect").addEventListener("change", function () {
+      const selectedLang = this.value;
+      document.getElementById("pasteName").placeholder = lang[selectedLang].placeholder;
+      document.querySelector("button").textContent = lang[selectedLang].button;
     });
   </script>
 </body>
