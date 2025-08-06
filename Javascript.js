@@ -51,6 +51,11 @@
   let selectedPasteId = null;
   let currentLang = 'english';
 
+  // Função para adicionar " | Hospedado Kitsune Hub" ao nome da pasta
+  function formatPasteId(rawId) {
+    return rawId + " | Hospedado Kitsune Hub";
+  }
+
   // Aplicar traduções na interface
   function applyLanguage(lang) {
     const tr = translations[lang];
@@ -94,8 +99,8 @@
     pastes.forEach(paste => {
       const li = document.createElement('li');
       li.classList.toggle('selected', paste.id === selectedPasteId);
-      li.textContent = paste.id;
-      li.title = paste.id;
+      li.textContent = formatPasteId(paste.id);
+      li.title = formatPasteId(paste.id);
       li.style.cursor = 'pointer';
 
       li.addEventListener('click', () => selectPaste(paste.id));
@@ -142,7 +147,12 @@
     }
 
     if (!selectedPasteId) {
-      selectedPasteId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      let rawId = prompt(currentLang === 'português' ? 'Digite o nome da pasta:' : 'Type the folder name:');
+      if (!rawId) {
+        alert(currentLang === 'português' ? 'Nome da pasta é obrigatório!' : 'Folder name is required!');
+        return;
+      }
+      selectedPasteId = rawId.trim();
     }
 
     const existingIndex = pastes.findIndex(p => p.id === selectedPasteId);
@@ -173,6 +183,7 @@
       return;
     }
     const baseUrl = location.origin + location.pathname;
+    // No link só o id cru, sem o | Hospedado Kitsune Hub para facilitar o uso no Roblox
     shareLinkInput.value = `${baseUrl}?id=${encodeURIComponent(id)}`;
   }
 
