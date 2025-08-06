@@ -1,537 +1,146 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kitsune Hub 🦊 - Editor Futurista</title>
-
-  <!-- Fonte futurista Orbitron -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
-
+  <title>Kitsune Hub 🦊</title>
   <style>
-    /* Reset básico */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* Futurista verde */
+    body.futurista {
+      margin:0; padding:0;
+      font-family:'Segoe UI',sans-serif;
+      background:#0a130a; color:#00ff99;
+      display:flex; flex-direction:column; align-items:center;
+      min-height:100vh; text-align:center;
     }
-
-    body, html {
-      height: 100%;
-      font-family: 'Orbitron', sans-serif;
-      background: radial-gradient(circle at center, #001a00 0%, #000 80%);
-      color: #00ff99;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow-x: hidden;
+    header.futurista {
+      width:100%;
+      padding:20px;
+      background: linear-gradient(90deg,#003300,#006622);
+      font-size:28px; font-weight:900;
+      color:#00ff99;
+      border-bottom:3px solid #00ff99;
+      text-shadow:0 0 10px #00ff99; user-select:none;
     }
-
-    /* Fundo animado simples */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background:
-        repeating-linear-gradient(
-          45deg,
-          rgba(0,255,153,0.07),
-          rgba(0,255,153,0.07) 2px,
-          transparent 2px,
-          transparent 10px
-        );
-      pointer-events: none;
-      animation: moveLines 10s linear infinite;
-      z-index: 0;
+    .buttons {
+      margin:20px auto; width:90%;max-width:700px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:center;
     }
-
-    @keyframes moveLines {
-      0% { background-position: 0 0; }
-      100% { background-position: 100px 100px; }
+    .button {
+      background:#004400; border:2px solid #00ff99;
+      padding:14px 25px; font-size:17px; border-radius:12px;
+      color:#00ff99; font-weight:700; box-shadow:0 0 15px #00ff99;
+      cursor:pointer; transition:background 0.3s,box-shadow 0.3s;
+      flex:1 1 180px; min-width:160px;
     }
-
-    /* Tela de seleção idioma */
-    #languageSelect {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 20, 10, 0.95);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 0 30px #00ff99;
-      transition: opacity 0.4s ease;
+    .button:hover {
+      background:#00ff99; color:#002200;
+      box-shadow:0 0 25px #00ff99;
     }
-    #languageSelect:not(.active) {
-      opacity: 0;
-      pointer-events: none;
+    .panel {
+      display:none; width:90%; max-width:700px;
+      background:#002200; border:2px solid #00ff99;
+      border-radius:15px; padding:20px; box-shadow:0 0 30px #00ff99;
+      margin-bottom:40px; text-align:left;
     }
-    #languageSelect h1 {
-      font-size: 2.2rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 8px #00ff99;
+    textarea {
+      width:100%; height:150px;
+      background:#001100; color:#00ff99;
+      border:1.5px solid #00ff99; border-radius:12px;
+      padding:12px; font-family:monospace;
+      font-size:15px; resize:vertical;
+      box-shadow: inset 0 0 6px #00ff99;
     }
-    #languageInput {
-      padding: 12px 20px;
-      font-size: 1.2rem;
-      border: 2px solid #00ff99;
-      background: transparent;
-      color: #00ff99;
-      border-radius: 8px;
-      width: 250px;
-      text-transform: capitalize;
-      box-shadow: 0 0 15px #00ff99;
-      transition: 0.3s;
-      outline: none;
-    }
-    #languageInput:focus {
-      background: rgba(0, 255, 153, 0.1);
-    }
-    #confirmLangBtn {
-      margin-top: 20px;
-      padding: 12px 30px;
-      background: transparent;
-      border: 2px solid #00ff99;
-      color: #00ff99;
-      font-size: 1.3rem;
-      cursor: pointer;
-      border-radius: 8px;
-      box-shadow: 0 0 15px #00ff99;
-      transition: background 0.3s;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    #confirmLangBtn:hover {
-      background: #00ff9940;
-    }
-
-    /* Main app container */
-    #mainApp {
-      width: 90%;
-      max-width: 900px;
-      background: #001000cc;
-      border: 2px solid #00ff99;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 0 40px #00ff99;
-      display: none;
-      flex-direction: column;
-      z-index: 5;
-      min-height: 500px;
-    }
-    #mainApp.active {
-      display: flex;
-    }
-
-    /* Header */
-    #title {
-      font-size: 2rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 15px;
-      text-shadow: 0 0 10px #00ff99;
-    }
-
-    /* Editor & Controls */
-    #pasteContentInput {
-      width: 100%;
-      height: 320px;
-      background: #002200;
-      border: 1.5px solid #00ff99;
-      border-radius: 10px;
-      color: #00ff99;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1rem;
-      padding: 15px;
-      resize: vertical;
-      box-shadow: inset 0 0 15px #00ff99aa;
-      outline: none;
-      margin-bottom: 15px;
-      white-space: pre-wrap;
-    }
-
-    /* Lista lateral de scripts */
-    #pasteList {
-      list-style: none;
-      max-height: 200px;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      padding-left: 0;
-      border: 1px solid #00ff99;
-      border-radius: 8px;
-      box-shadow: inset 0 0 15px #00ff99aa;
-    }
-    #pasteList li {
-      padding: 8px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #00ff9944;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      color: #00ff99;
-      transition: background 0.3s;
-      user-select: none;
-    }
-    #pasteList li.selected {
-      background: #005533cc;
-      font-weight: 700;
-      box-shadow: 0 0 8px #00ff99;
-    }
-    #pasteList li:hover {
-      background: #004422bb;
-    }
-    #pasteList li button.deleteBtn {
-      background: none;
-      border: none;
-      color: #ff4444;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 0 6px;
-      line-height: 1;
-      user-select: none;
-      transition: color 0.2s;
-    }
-    #pasteList li button.deleteBtn:hover {
-      color: #ff0000;
-    }
-
-    /* Botões */
-    .buttonRow {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-    button {
-      cursor: pointer;
-      background: transparent;
-      border: 2px solid #00ff99;
-      color: #00ff99;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 10px 22px;
-      border-radius: 8px;
-      box-shadow: 0 0 15px #00ff99;
-      transition: all 0.3s ease;
-      user-select: none;
-    }
-    button:hover {
-      background: #00ff9955;
-      box-shadow: 0 0 20px #00ff99;
-    }
-
-    /* Input do link compartilhado */
-    #shareLink {
-      width: 100%;
-      padding: 8px 12px;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      border: 1.5px solid #00ff99;
-      background: #001100dd;
-      color: #00ff99;
-      user-select: all;
-      box-shadow: inset 0 0 15px #00ff99aa;
-      margin-top: 5px;
-    }
-
-    /* Responsivo */
-    @media (max-width: 600px) {
-      #pasteContentInput {
-        height: 240px;
-      }
-      #title {
-        font-size: 1.6rem;
-      }
-      button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-      }
-      #languageInput {
-        width: 100%;
-        max-width: 300px;
-      }
+    h2 { color:#00ff99; font-weight:900; margin-bottom:15px;
+         text-shadow:0 0 7px #00ff99; }
+    .result { color:#00ff99; margin-top:15px; word-wrap:break-word; font-weight:700; }
+    /* RAW view limpar */
+    body.raw { margin:1rem; background:#fff; color:#111; font-family:Consolas,monospace; text-align:left; }
+    pre.raw {
+      background:#eee; border:1px solid #ccc; padding:1rem;
+      border-radius:4px; white-space:pre-wrap; word-break:break-word;
+      font-size:14px; line-height:1.4;
     }
   </style>
 </head>
-<body>
+<body class="futurista">
+  <header id="pageHeader" class="futurista">🦊 Kitsune Hub – Developer / Owner / WebSiteDesigner</header>
 
-  <!-- Tela seleção idioma -->
-  <section id="languageSelect" class="active">
-    <h1>Escolha seu idioma / Choose your language</h1>
-    <input type="text" id="languageInput" placeholder="Digite seu idioma (ex: English, Português)" />
-    <button id="confirmLangBtn">Confirmar</button>
-  </section>
-
-  <!-- Editor principal -->
-  <main id="mainApp">
-    <h1 id="title">🦊 Kitsune Hub - Editor Roblox</h1>
-
-    <ul id="pasteList"></ul>
-
-    <textarea id="pasteContentInput" placeholder="Cole seu script Roblox aqui..."></textarea>
-
-    <div class="buttonRow">
-      <button id="saveBtn">Salvar Script</button>
-      <button id="deleteBtn">Excluir Script</button>
-      <button id="newPasteBtn">Novo Script</button>
+  <div id="mainContent" class="futurista">
+    <div class="buttons">
+      <button class="button" onclick="showPanel('pastefy')">Kitsune Pastefy 🦊</button>
+      <button class="button" onclick="showPanel('loadstring')">Kitsune Loadstring 🦊</button>
+      <button class="button" onclick="showPanel('curtor')">Kitsune Curtor 🦊</button>
     </div>
 
-    <input id="shareLink" readonly placeholder="O link para usar no Roblox aparecerá aqui..." />
-  </main>
+    <div id="pastefy" class="panel">
+      <h2>Kitsune Pastefy 🦊</h2>
+      <textarea id="txtPastefy" placeholder="Cole seu script aqui"></textarea>
+      <button class="button" onclick="save('pastefy')">Salvar e Gerar Link</button>
+      <div id="resPastefy" class="result"></div>
+    </div>
 
-  <script>
-    (() => {
-      const translations = {
-        english: {
-          title: "🦊 Kitsune Hub - Roblox Script Editor",
-          pastePlaceholder: "Paste your Roblox script here...",
-          saveBtn: "Save Script",
-          deleteBtn: "Delete Script",
-          newPasteBtn: "New Script",
-          shareLinkPlaceholder: "The link to use in Roblox will appear here...",
-          noScripts: "No scripts saved.",
-          confirmLangBtn: "Confirm",
-          langInputPlaceholder: "Type your language (e.g. English, Português)",
-          chooseLangTitle: "Choose your language / Escolha seu idioma",
-          confirmDelete: "Delete this script?",
-          alertSaved: "Script saved locally!",
-          alertEmpty: "Script content cannot be empty."
-        },
-        português: {
-          title: "🦊 Kitsune Hub - Editor de Scripts Roblox",
-          pastePlaceholder: "Cole seu script Roblox aqui...",
-          saveBtn: "Salvar Script",
-          deleteBtn: "Excluir Script",
-          newPasteBtn: "Novo Script",
-          shareLinkPlaceholder: "O link para usar no Roblox aparecerá aqui...",
-          noScripts: "Nenhum script salvo.",
-          confirmLangBtn: "Confirmar",
-          langInputPlaceholder: "Digite seu idioma (ex: English, Português)",
-          chooseLangTitle: "Escolha seu idioma / Choose your language",
-          confirmDelete: "Excluir este script?",
-          alertSaved: "Script salvo localmente!",
-          alertEmpty: "O conteúdo do script não pode ser vazio."
-        }
-      };
+    <div id="loadstring" class="panel">
+      <h2>Kitsune Loadstring 🦊</h2>
+      <textarea id="txtLoadstring" placeholder="Cole seu script aqui"></textarea>
+      <button class="button" onclick="save('loadstring')">Salvar e Gerar Link</button>
+      <div id="resLoadstring" class="result"></div>
+    </div>
 
-      const languageSelect = document.getElementById('languageSelect');
-      const mainApp = document.getElementById('mainApp');
-      const languageInput = document.getElementById('languageInput');
-      const confirmLangBtn = document.getElementById('confirmLangBtn');
+    <div id="curtor" class="panel">
+      <h2>Kitsune Curtor 🦊</h2>
+      <textarea id="txtCurtor" placeholder="Cole seu script aqui"></textarea>
+      <button class="button" onclick="save('curtor')">Salvar e Gerar Link</button>
+      <div id="resCurtor" class="result"></div>
+    </div>
+  </div>
 
-      const pasteListEl = document.getElementById('pasteList');
-      const pasteContentInput = document.getElementById('pasteContentInput');
-      const saveBtn = document.getElementById('saveBtn');
-      const deleteBtn = document.getElementById('deleteBtn');
-      const newPasteBtn = document.getElementById('newPasteBtn');
-      const shareLinkInput = document.getElementById('shareLink');
-      const titleEl = document.getElementById('title');
+<script>
+  function showPanel(id) {
+    ['pastefy','loadstring','curtor'].forEach(p=>{
+      document.getElementById(p).style.display = (p===id?'block':'none');
+    });
+  }
 
-      let pastes = [];
-      let selectedPasteId = null;
-      let currentLang = 'english';
+  function generateId() { return prompt("Nome da pasta?"); }
 
-      function applyLanguage(lang) {
-        const tr = translations[lang];
-        titleEl.textContent = tr.title;
-        pasteContentInput.placeholder = tr.pastePlaceholder;
-        saveBtn.textContent = tr.saveBtn;
-        deleteBtn.textContent = tr.deleteBtn;
-        newPasteBtn.textContent = tr.newPasteBtn;
-        shareLinkInput.placeholder = tr.shareLinkPlaceholder;
-        languageInput.placeholder = tr.langInputPlaceholder;
-        confirmLangBtn.textContent = tr.confirmLangBtn;
-        languageSelect.querySelector('h1').textContent = tr.chooseLangTitle;
+  function save(type){
+    const txt = document.getElementById('txt'+capitalize(type)).value.trim();
+    if(!txt) return alert("Cole o script primeiro.");
+    const folder = generateId();
+    if(!folder) return alert("Pasta inválida.");
 
-        renderPasteList();
-      }
+    const obj = JSON.parse(localStorage.getItem('kitsune_folder_' + folder) || '{}');
+    obj.name = folder;
+    obj.scripts = obj.scripts||{};
+    obj.scripts[type] = txt;
+    localStorage.setItem('kitsune_folder_' + folder, JSON.stringify(obj));
 
-      function loadPastes() {
-        const saved = localStorage.getItem('kitsune_pastes');
-        if (saved) {
-          try {
-            pastes = JSON.parse(saved);
-          } catch {
-            pastes = [];
-          }
-        } else {
-          pastes = [];
-        }
-      }
+    const link = location.origin + location.pathname + '?raw=' + encodeURIComponent(folder);
+    document.getElementById('res'+capitalize(type)).innerHTML =
+      `🔗 Link RAW da pasta <b>${folder}</b>:<br><a href="${link}" target="_blank">${link}</a><br><br>` +
+      `Use no Roblox:<br><code>loadstring(game:HttpGet("${link}"))()</code>`;
+  }
 
-      function savePastes() {
-        localStorage.setItem('kitsune_pastes', JSON.stringify(pastes));
-      }
+  function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 
-      function renderPasteList() {
-        pasteListEl.innerHTML = '';
-        if (pastes.length === 0) {
-          pasteListEl.innerHTML = `<li style="color:#555;cursor:default;">${translations[currentLang].noScripts}</li>`;
-          return;
-        }
-        pastes.forEach(paste => {
-          const li = document.createElement('li');
-          li.classList.toggle('selected', paste.id === selectedPasteId);
-          li.textContent = paste.id;
-          li.title = paste.id;
-          li.style.cursor = 'pointer';
+  (function checkRaw(){
+    const f = new URL(location.href).searchParams.get('raw');
+    if(!f) return;
+    const data = localStorage.getItem('kitsune_folder_' + f);
+    if(!data) {
+      document.body.className='raw'; document.body.innerHTML=`<p>❌ Pasta "${f}" não encontrada.</p>`;
+      return;
+    }
+    const obj = JSON.parse(data);
+    const name = obj.name;
+    const script = obj.scripts.pastefy||obj.scripts.loadstring||obj.scripts.curtor;
+    document.body.className='raw';
+    document.body.innerHTML = `<header class="raw">${name}</header><pre class="raw">${script}</pre>`;
+  })();
 
-          li.addEventListener('click', () => selectPaste(paste.id));
-
-          const delBtn = document.createElement('button');
-          delBtn.textContent = '×';
-          delBtn.className = 'deleteBtn';
-          delBtn.title = translations[currentLang].confirmDelete;
-          delBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            if (confirm(translations[currentLang].confirmDelete)) {
-              deletePaste(paste.id);
-            }
-          });
-          li.appendChild(delBtn);
-
-          pasteListEl.appendChild(li);
-        });
-      }
-
-      function selectPaste(id) {
-        const paste = pastes.find(p => p.id === id);
-        if (!paste) return;
-        selectedPasteId = id;
-        pasteContentInput.value = paste.content || '';
-        updateShareLink(id);
-        renderPasteList();
-      }
-
-      function newPaste() {
-        selectedPasteId = null;
-        pasteContentInput.value = '';
-        shareLinkInput.value = '';
-        renderPasteList();
-        pasteContentInput.focus();
-      }
-
-      function saveCurrentPaste() {
-        const content = pasteContentInput.value.trim();
-        if (!content) {
-          alert(translations[currentLang].alertEmpty);
-          return;
-        }
-
-        if (!selectedPasteId) {
-          selectedPasteId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-        }
-
-        const existingIndex = pastes.findIndex(p => p.id === selectedPasteId);
-        if (existingIndex >= 0) {
-          pastes[existingIndex].content = content;
-        } else {
-          pastes.push({ id: selectedPasteId, content });
-        }
-        savePastes();
-        renderPasteList();
-        updateShareLink(selectedPasteId);
-        alert(translations[currentLang].alertSaved);
-      }
-
-      function deletePaste(id) {
-        pastes = pastes.filter(p => p.id !== id);
-        if (selectedPasteId === id) {
-          newPaste();
-        }
-        savePastes();
-        renderPasteList();
-        shareLinkInput.value = '';
-      }
-
-      function updateShareLink(id) {
-        if (!id) {
-          shareLinkInput.value = '';
-          return;
-        }
-        const baseUrl = location.origin + location.pathname;
-        shareLinkInput.value = `${baseUrl}?id=${encodeURIComponent(id)}`;
-      }
-
-      function checkRawView() {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        if (id) {
-          const paste = pastes.find(p => p.id === id);
-          if (paste) {
-            document.body.innerHTML = '';
-            const pre = document.createElement('pre');
-            pre.style.background = '#000';
-            pre.style.color = '#0f0';
-            pre.style.padding = '20px';
-            pre.style.whiteSpace = 'pre-wrap';
-            pre.style.fontFamily = 'monospace';
-            pre.style.fontSize = '1.1em';
-            pre.style.maxWidth = '900px';
-            pre.style.margin = '20px auto';
-            pre.textContent = paste.content;
-            document.body.appendChild(pre);
-            return true;
-          } else {
-            document.body.innerHTML = '<p style="color:red; text-align:center; margin-top:20px;">Script não encontrado!</p>';
-            return true;
-          }
-        }
-        return false;
-      }
-
-      confirmLangBtn.addEventListener('click', () => {
-        let lang = languageInput.value.toLowerCase().trim();
-        if (!lang) return alert('Please type a language / Por favor, digite um idioma.');
-
-        if (!['english', 'português'].includes(lang)) lang = 'english';
-
-        currentLang = lang;
-        localStorage.setItem('kitsune_lang', currentLang);
-        applyLanguage(currentLang);
-        languageSelect.classList.remove('active');
-        mainApp.classList.add('active');
-
-        loadPastes();
-        renderPasteList();
-        newPaste();
-      });
-
-      window.addEventListener('load', () => {
-        loadPastes();
-
-        if (checkRawView()) return;
-
-        const params = new URLSearchParams(window.location.search);
-        const urlLang = params.get('lang');
-
-        if (urlLang && translations[urlLang]) {
-          currentLang = urlLang;
-          applyLanguage(currentLang);
-          languageSelect.classList.remove('active');
-          mainApp.classList.add('active');
-          renderPasteList();
-          newPaste();
-          return;
-        }
-
-        const savedLang = localStorage.getItem('kitsune_lang');
-        if (savedLang && translations[savedLang]) {
-          currentLang = savedLang;
-          applyLanguage(currentLang);
-          languageSelect.classList.remove('active');
-          mainApp.classList.add('active');
-          renderPasteList();
-          newPaste();
-        } else {
-          languageSelect.classList.add('active');
-          mainApp.classList.remove('
+  showPanel('pastefy');
+</script>
+</body>
+</html>
