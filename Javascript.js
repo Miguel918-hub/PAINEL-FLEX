@@ -170,11 +170,8 @@
       return;
     }
 
-    const paste = pastes.find(p => p.id === id);
-    if (!paste) return;
-
-    const base64 = btoa(unescape(encodeURIComponent(paste.content)));
-    shareLinkInput.value = `loadstring(game:HttpGet("data:text/plain;base64,${base64}"))()`;
+    const url = location.origin + location.pathname;
+    shareLinkInput.value = `loadstring(game:HttpGet("${url}?id=${encodeURIComponent(id)}"))()`;
   }
 
   function checkRawView() {
@@ -186,15 +183,13 @@
       if (paste) {
         document.body.innerHTML = '';
         const pre = document.createElement('pre');
-        pre.style.background = '#000';
-        pre.style.color = '#0f0';
-        pre.style.padding = '20px';
-        pre.style.whiteSpace = 'pre-wrap';
+        pre.style.background = 'transparent';
+        pre.style.color = 'white';
+        pre.style.padding = '0';
+        pre.style.margin = '0';
         pre.style.fontFamily = 'monospace';
-        pre.style.fontSize = '1.1em';
-        pre.style.maxWidth = '900px';
-        pre.style.margin = '20px auto';
-        pre.textContent = btoa(unescape(encodeURIComponent(paste.content)));
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.textContent = paste.content;
         document.body.appendChild(pre);
         return true;
       } else {
