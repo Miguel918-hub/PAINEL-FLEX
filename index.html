@@ -71,12 +71,15 @@
             margin-top: 10px;
         }
         #fovCircle {
-            position: absolute;
+            position: fixed; /* Corrigido para fixed para estar visível em toda a tela */
             border: 2px solid #f00;
             border-radius: 50%;
             background-color: rgba(255, 0, 0, 0.2);
             pointer-events: none;
             display: none; /* Começa invisível */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
@@ -213,8 +216,6 @@
             const fovSize = aimFovRange.value * 10;  // Aumenta o tamanho do FOV
             fovCircle.style.width = `${fovSize}px`;
             fovCircle.style.height = `${fovSize}px`;
-            fovCircle.style.top = `${(window.innerHeight - fovSize) / 2}px`;
-            fovCircle.style.left = `${(window.innerWidth - fovSize) / 2}px`;
         });
 
         // Exibir/Esconder o FOV Circle e a mensagem
