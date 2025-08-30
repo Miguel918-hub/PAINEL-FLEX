@@ -1,77 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Kitsune Obfuscador 🦊</title>
-  <style>
-    body {
-      background: #111;
-      color: #eee;
-      font-family: monospace;
-      padding: 20px;
-      text-align: center;
-    }
-    textarea {
-      width: 90%;
-      height: 200px;
-      background: #222;
-      color: #0f0;
-      border: 1px solid #555;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      background: #ff5500;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 5px;
-    }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #333;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>PAINEL FFH4X</title>
+<style>
+  body {margin:0; overflow:hidden; font-family:Arial,sans-serif; background:#000; color:#fff;}
+  canvas#stars {position:fixed; top:0; left:0; z-index:0;}
+  #panel {position:absolute; top:50px; left:50px; background:#111; border:2px solid #0f0; border-radius:15px; padding:20px; width:400px; height:500px; z-index:10; cursor:move; box-shadow:0 0 20px #0f0; overflow:auto;}
+  h2 {margin-top:0; color:#0f0; text-align:center;}
+  .tabs button {margin:5px 2px; padding:5px 10px; background:#222; color:#0f0; border:none; cursor:pointer;}
+  .tab-content {margin-top:10px;}
+  .hidden {display:none;}
+  footer {margin-top:10px; font-size:0.8em; color:#aaa; text-align:center;}
+  label {display:block; margin:5px 0;}
+</style>
 </head>
 <body>
-
-  <h1>🦊 Kitsune Hub | Obfuscador de Script</h1>
-
-  <textarea id="scriptInput" placeholder="Cole aqui seu script Roblox (LocalScript)..."></textarea><br>
-
-  <button onclick="obfuscateScript()">Obfuscar & Gerar Loadstring</button>
-  <br>
-  <input type="text" id="loadstringOutput" readonly placeholder="Loadstring aparecerá aqui...">
-  <br>
-  <button onclick="copyLoadstring()">Copiar Loadstring</button>
-
-  <script>
-    function obfuscateScript() {
-      const input = document.getElementById('scriptInput').value.trim();
-      if (!input) return alert("Cole um script antes!");
-
-      // Obfuscador básico (não muito seguro, mas protege contra cópia rápida)
-      const base64 = btoa(input); // codifica em base64
-
-      const loadstring = `loadstring(game:HttpGet("data:text/plain;base64,${base64}", true))()`;
-
-      document.getElementById('loadstringOutput').value = loadstring;
-    }
-
-    function copyLoadstring() {
-      const output = document.getElementById('loadstringOutput');
-      output.select();
-      document.execCommand('copy');
-      alert('Loadstring copiado!');
-    }
-  </script>
-
+<canvas id="stars"></canvas>
+<div id="panel">
+<h2>PAINEL FFH4X</h2>
+<div class="tabs">
+<button onclick="showTab('aimbot')">Aimbot</button>
+<button onclick="showTab('visuals')">Visuals</button>
+<button onclick="showTab('misc')">Misc</button>
+<button onclick="showTab('settings')">Settings</button>
+</div>
+<div id="aimbot" class="tab-content">
+<label><input type="checkbox"> Ativar Aimbot</label>
+<label><input type="checkbox"> Exibir Círculo do FOV</label>
+<label>AIMFOV: <input type="range" min="0" max="100"></label>
+<label>Target:
+<select>
+<option>Cabeça</option>
+<option>Peito</option>
+<option>Pés</option>
+</select>
+</label>
+<label><input type="radio" name="tipo"> Ao Atirar</label>
+<label><input type="radio" name="tipo"> Ao Olhar</label>
+</div>
+<div id="visuals" class="tab-content hidden">
+<label><input type="checkbox"> Enemy ESP</label>
+<label><input type="checkbox"> Line</label>
+<label><input type="checkbox"> Use fire material</label>
+<label><input type="checkbox"> Box</label>
+<label><input type="checkbox"> Health</label>
+<label><input type="checkbox"> Nickname</label>
+<label><input type="checkbox"> Distance</label>
+<label><input type="checkbox"> Nearby enemies count</label>
+<label>Counter text size: <input type="range" min="10" max="30"></label>
+</div>
+<div id="misc" class="tab-content hidden">
+<label><input type="checkbox"> No fog</label>
+<label><input type="checkbox"> No FPS limit</label>
+<label><input type="checkbox"> No weapon recoil</label>
+<label><input type="checkbox"> Fast weapon swap</label>
+</div>
+<div id="settings" class="tab-content hidden">
+<label><input type="checkbox"> Reset All</label>
+<label><input type="checkbox"> Inject File</label>
+<label>Selecione seu iPhone:
+<select id="iphone-select">
+<option>iPhone 8</option>
+<option>iPhone 8 Plus</option>
+<option>iPhone X</option>
+<option>iPhone XR</option>
+<option>iPhone XS</option>
+<option>iPhone 11</option>
+<option>iPhone 11 Pro</option>
+<option>iPhone 12</option>
+<option>iPhone 12 Pro</option>
+<option>iPhone 13</option>
+<option>iPhone 13 Pro</option>
+<option>iPhone 14</option>
+<option>iPhone 14 Pro</option>
+<option>iPhone 15</option>
+<option>iPhone 15 Pro</option>
+<option>iPhone 16</option>
+</select>
+</label>
+</div>
+<footer>Powered by: GhostFox</footer>
+</div>
+<script>
+function showTab(tabId){document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.add('hidden')); document.getElementById(tabId).classList.remove('hidden');}
+const panel=document.getElementById('panel'); let isDragging=false, offsetX, offsetY;
+panel.addEventListener('mousedown',(e)=>{isDragging=true; offsetX=e.clientX-panel.offsetLeft; offsetY=e.clientY-panel.offsetTop;});
+document.addEventListener('mousemove',(e)=>{if(isDragging){panel.style.left=`${e.clientX-offsetX}px`; panel.style.top=`${e.clientY-offsetY}px`;}}); 
+document.addEventListener('mouseup',()=>isDragging=false);
+const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d'); canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+let stars=Array.from({length:200},()=>({x:Math.random()*canvas.width, y:Math.random()*canvas.height, speed:Math.random()*2+1, size:Math.random()*3+1, color:['#f00','#0ff','#fff','#0f0','#ff0'][Math.floor(Math.random()*5)]}));
+function animateStars(){ctx.clearRect(0,0,canvas.width,canvas.height); stars.forEach(star=>{ctx.fillStyle=star.color; ctx.fillRect(star.x,star.y,star.size,star.size); star.y+=star.speed; if(star.y>canvas.height){star.y=0; star.x=Math.random()*canvas.width;}}); requestAnimationFrame(animateStars);}
+animateStars();
+</script>
 </body>
 </html>
