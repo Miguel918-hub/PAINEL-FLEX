@@ -18,7 +18,7 @@
             z-index: 0;
         }
         #panel {
-            position: absolute;
+            position: relative; /* Agora serve de container para o círculo */
             top: 50px;
             left: 50px;
             background: #111;
@@ -71,12 +71,12 @@
             margin-top: 10px;
         }
         #fovCircle {
-            position: fixed; /* Corrigido para fixed para estar visível em toda a tela */
+            position: absolute; /* relativo ao painel */
             border: 2px solid #f00;
             border-radius: 50%;
             background-color: rgba(255, 0, 0, 0.2);
             pointer-events: none;
-            display: none; /* Começa invisível */
+            display: none;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -149,6 +149,9 @@
         </div>
         <footer>Powered by: GhostFox</footer>
         <div id="fovWarning">Aviso: Se você sair do app, o FOV será perdido, mas o sistema continuará funcionando.</div>
+        
+        <!-- círculo dentro do painel -->
+        <div id="fovCircle"></div>
     </div>
 
     <script>
@@ -207,13 +210,11 @@
         const fovCheckbox = document.getElementById('fovCheckbox');
         const aimFovRange = document.getElementById('aimFovRange');
         const fovWarning = document.getElementById('fovWarning');
-        const fovCircle = document.createElement('div');
-        fovCircle.id = 'fovCircle';
-        document.body.appendChild(fovCircle);
+        const fovCircle = document.getElementById('fovCircle');
 
         // Ajusta o tamanho do FOV com base no AIMFOV
         aimFovRange.addEventListener('input', () => {
-            const fovSize = aimFovRange.value * 10;  // Aumenta o tamanho do FOV
+            const fovSize = aimFovRange.value * 3;  // ajustei para não ficar gigante
             fovCircle.style.width = `${fovSize}px`;
             fovCircle.style.height = `${fovSize}px`;
         });
