@@ -1,0 +1,281 @@
+s<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAINEL MKTZ STYLE</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #000000;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+    }
+    .panel {
+      width: 350px;
+      background-color: #0c1142;
+      border: 2px solid #0099ff;
+      border-radius: 8px;
+      margin: 30px auto;
+      padding: 10px;
+      box-shadow: 0 0 20px #0099ff;
+    }
+    .header {
+      background-color: #0099ff;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 6px 6px 0 0;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin: 10px 0;
+    }
+    .tab {
+      background-color: #000000;
+      border: 1px solid #0099ff;
+      border-radius: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.3s;
+      user-select: none;
+    }
+    .tab:hover, .tab.active {
+      background-color: #0099ff;
+      color: #000;
+    }
+    .content {
+      display: none;
+      padding: 10px;
+    }
+    .content.active {
+      display: block;
+    }
+    .option-group {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #0099ff;
+      padding-bottom: 10px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    .option label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .option input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.3);
+      accent-color: #0026ff;
+    }
+    .slider-input {
+      width: 100%;
+    }
+    .select-box {
+      width: 100%;
+      padding: 5px;
+      background-color: #000000;
+      color: #fff;
+      border: 1px solid #0099ff;
+      border-radius: 4px;
+    }
+    .radio-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .radio-group input[type="radio"] {
+      margin-right: 6px;
+      accent-color: #0099ff;
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="header">PAINEL HEATRICK GRATIS MTZ</div>
+    <div class="tabs">
+      <div class="tab active" data-tab="aimbot">Headtrick</div>
+      <div class="tab" data-tab="esp">Bypass</div>
+      <div class="tab" data-tab="misc">Fps</div>
+      <div class="tab" data-tab="settings">Settings</div>
+    </div>
+
+    <!-- AIMBOT -->
+    <div class="content active" id="aimbot">
+      <div class="option-group">
+        <div class="option"><label><input type="checkbox" />  Codigos</label></div>
+        <div class="option"><label><input type="checkbox" />  Headtrick</label></div>
+        <div class="option"><label>Regular % Auxilar:</label><input class="slider-input" type="range" min="0" max="360" value="270" /></div>
+        <div class="option"><label>Modo Sensi:</label>
+          <select class="select-box">
+            <option value="cabeca">Sensi Alta</option>
+            <option value="peito">Sensi Baixa</option>
+            <option value="pes">Sensi Media</option>
+          </select>
+        </div>
+        <div class="option"><label>Tipo de Mira:</label></div>
+        <div class="radio-group">
+          <label><input type="radio" name="tipoAimbot" checked /> Precisa</label>
+          <label><input type="radio" name="tipoAimbot" /> Rapida</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUALS / ESP -->
+    <div class="content" id="esp">
+      <div class="option-group">
+        <div class="option"><label><input type="checkbox" /> Anti ban</label></div>
+        <div class="option"><label><input type="checkbox" /> Anti Blacklist</label></div>
+        <div class="option"><label><input type="checkbox" /> Anti Denuncias</label></div>
+        <div class="option"><label><input type="checkbox" /> Disfarce</label></div>
+        <div class="option"><label><input type="checkbox" /> Health</label></div>
+        <div class="option"><label><input type="checkbox" /> Id ocult</label></div>
+        <div class="option"><label><input type="checkbox" /> Distance</label></div>
+        <div class="option"><label><input type="checkbox" /> Nearby enemies count</label></div>
+        <div class="option"><label>Counter text size:</label><input class="slider-input" type="range" min="10" max="50" value="25" /></div>
+      </div>
+    </div>
+
+    <!-- MISC -->
+    <div class="content" id="misc">
+      <div class="option-group">
+        <div class="option"><label><input type="checkbox" /> FPS limitedS</label></div>
+        <div class="option"><label><input type="checkbox" /> 90 Hz</label></div>
+        <div class="option"><label><input type="checkbox" /> Bateria Boost</label></div>
+        <div class="option"><label><input type="checkbox" /> Melhorar Touch</label></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="content" id="settings">
+      <div class="option-group">
+        <div class="option"><label><input type="checkbox" /> Reset All</label></div>
+        <div class="option"><label><input type="checkbox" /> Inject File</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT AJUSTADO PARA PC + MOBILE -->
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.content');
+
+    function activateTab(tab) {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.getAttribute('data-tab');
+      document.getElementById(target).classList.add('active');
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => activateTab(tab));
+      tab.addEventListener('touchstart', () => activateTab(tab), { passive: true });
+    });
+  </script>
+<!-- FUNDO ANIMADO COM PARTÍCULAS -->
+<canvas id="particles-bg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;"></canvas>
+<script>
+const canvas = document.getElementById('particles-bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+for (let i = 0; i < 100; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 2 + 1,
+    color: ['#FFFFFF', '#ffffff', '#FFFFFF'][Math.floor(Math.random() * 3)],
+    vx: Math.random() * 0.5 - 0.25,
+    vy: Math.random() * 0.5 - 0.25
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  });
+}
+
+function updateParticles() {
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0 || p.x > canvas.width) p.vx = -p.vx;
+    if (p.y < 0 || p.y > canvas.height) p.vy = -p.vy;
+  });
+}
+
+function loopParticles() {
+  drawParticles();
+  updateParticles();
+  requestAnimationFrame(loopParticles);
+}
+loopParticles();
+</script>
+  <!-- Script para feedback de sucesso ao ativar funções -->
+  <script>
+    // Função para exibir o feedback de sucesso
+    function showSuccessMessage(message) {
+      const successMessage = document.createElement('div');
+      successMessage.textContent = message;
+      successMessage.style.position = 'absolute';
+      successMessage.style.top = '50px';
+      successMessage.style.left = '50%';
+      successMessage.style.transform = 'translateX(-50%)';
+      successMessage.style.backgroundColor = '#1E90FF';
+      successMessage.style.color = '#000';
+      successMessage.style.padding = '10px 20px';
+      successMessage.style.borderRadius = '5px';
+      successMessage.style.fontSize = '16px';
+      successMessage.style.zIndex = '1000';
+      successMessage.style.boxShadow = '0 0 10px rgba(0, 255, 153, 0.8)';
+      document.body.appendChild(successMessage);
+
+      // Remove a mensagem após 3 segundos
+      setTimeout(() => {
+        successMessage.remove();
+      }, 3000);
+    }
+
+    // Adiciona o evento para mostrar a mensagem quando o checkbox for ativado
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+        if (this.checked) {
+          showSuccessMessage(`${this.parentElement.textContent.trim()} ativado com sucesso😈!`);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+</body>
+</html>
+
+
+
+
